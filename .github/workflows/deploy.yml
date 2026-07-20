@@ -1,0 +1,195 @@
+name: Deploy production
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: leadex-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    env:
+      SERVER_HOST: ${{ secrets.HOST }}
+      SERVER_PASS: ${{ secrets.PASS }}
+      SERVER_USER: root
+      APP_DIR: /opt/apps/leadex/Leadex
+      SOURCE_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+    steps:
+      - name: Check out validated commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SOURCE_SHA }}
+          fetch-depth: 0
+
+      - name: Install deployment tools
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends sshpass rsync
+
+      - name: Deploy and restart Leadex
+        id: deployment
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          exec > >(tee /tmp/leadex-deploy.log) 2>&1
+
+          test -n "$SERVER_HOST" || { echo "ERROR: HOST secret is missing"; exit 1; }
+          test -n "$SERVER_PASS" || { echo "ERROR: PASS secret is missing"; exit 1; }
+
+          SSH_OPTIONS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=15"
+
+          sshpass -p "$SERVER_PASS" ssh $SSH_OPTIONS \
+            "$SERVER_USER@$SERVER_HOST" \
+            "mkdir -p '$APP_DIR'"
+
+          echo "Synchronizing validated source commit $SOURCE_SHA..."
+          sshpass -p "$SERVER_PASS" rsync -az --delete \
+            -e "ssh $SSH_OPTIONS" \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='.env' \
+            --exclude='.env.*' \
+            --exclude='venv/' \
+            --exclude='.venv/' \
+            --exclude='env/' \
+            --exclude='media/' \
+            --exclude='uploads/' \
+            --exclude='logs/' \
+            --exclude='exports/' \
+            --exclude='credentials.json' \
+            --exclude='token.json' \
+            --exclude='CI_STATUS.md' \
+            --exclude='DEPLOY_STATUS.md' \
+            ./ "$SERVER_USER@$SERVER_HOST:$APP_DIR/"
+
+          sshpass -p "$SERVER_PASS" ssh $SSH_OPTIONS \
+            "$SERVER_USER@$SERVER_HOST" \
+            "APP_DIR='$APP_DIR' SOURCE_SHA='$SOURCE_SHA' bash -s" <<'REMOTE'
+          set -euo pipefail
+
+          cd "$APP_DIR"
+          test -f .env || { echo "ERROR: $APP_DIR/.env is missing"; exit 1; }
+          test -f requirements.txt || { echo "ERROR: requirements.txt is missing"; exit 1; }
+
+          VENV_DIR="$APP_DIR/venv"
+          if [[ ! -x "$VENV_DIR/bin/python" ]]; then
+            echo "Creating Python virtual environment..."
+            python3 -m venv "$VENV_DIR"
+          fi
+
+          "$VENV_DIR/bin/python" -m pip install --upgrade pip wheel
+          "$VENV_DIR/bin/python" -m pip install -r requirements.txt
+          "$VENV_DIR/bin/python" -m pip check
+
+          echo "Checking source syntax..."
+          "$VENV_DIR/bin/python" -m compileall -q app
+
+          echo "Applying database migrations..."
+          "$VENV_DIR/bin/alembic" upgrade head
+
+          cat > /etc/systemd/system/leadex.service <<SERVICE
+          [Unit]
+          Description=Leadex FastAPI application
+          After=network-online.target postgresql.service redis-server.service
+          Wants=network-online.target
+
+          [Service]
+          Type=simple
+          User=root
+          Group=root
+          WorkingDirectory=$APP_DIR
+          EnvironmentFile=$APP_DIR/.env
+          ExecStart=$VENV_DIR/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 2
+          Restart=always
+          RestartSec=5
+          TimeoutStopSec=30
+          KillSignal=SIGINT
+
+          [Install]
+          WantedBy=multi-user.target
+          SERVICE
+
+          systemctl stop leadex.service 2>/dev/null || true
+          pkill -f 'uvicorn app.main:app' 2>/dev/null || true
+          systemctl daemon-reload
+          systemctl enable leadex.service
+          systemctl start leadex.service
+
+          echo "Waiting for the health endpoint..."
+          healthy=0
+          for attempt in $(seq 1 24); do
+            if curl -fsS http://127.0.0.1:8000/health | grep -q '"status":"ok"'; then
+              healthy=1
+              break
+            fi
+            sleep 2
+          done
+
+          if [[ "$healthy" -ne 1 ]]; then
+            systemctl status leadex.service --no-pager || true
+            journalctl -u leadex.service -n 100 --no-pager || true
+            exit 1
+          fi
+
+          systemctl is-active --quiet leadex.service
+          echo "Deployment succeeded for commit $SOURCE_SHA"
+          curl -fsS http://127.0.0.1:8000/health
+          REMOTE
+
+      - name: Publish deployment status
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git checkout -B main origin/main
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          {
+            if [[ "${{ steps.deployment.outcome }}" == "success" ]]; then
+              echo "# Production deployment succeeded"
+              echo
+              echo "- Source commit: \`$SOURCE_SHA\`"
+              echo "- Server path: \`$APP_DIR\`"
+              echo "- Service: \`leadex.service\`"
+              echo "- Health check: \`/health\` returned OK"
+            else
+              echo "# Production deployment failed"
+              echo
+              echo "- Source commit: \`$SOURCE_SHA\`"
+              echo
+              echo '```text'
+              if [[ -f /tmp/leadex-deploy.log ]]; then
+                tail -n 180 /tmp/leadex-deploy.log
+              else
+                echo "Deployment failed before a diagnostic log was created."
+              fi
+              echo '```'
+            fi
+          } > DEPLOY_STATUS.md
+
+          git add DEPLOY_STATUS.md
+          git commit -m "cd: update production deployment status" || true
+          git push origin HEAD:main
+
+      - name: Fail when deployment failed
+        if: steps.deployment.outcome != 'success'
+        shell: bash
+        run: exit 1
