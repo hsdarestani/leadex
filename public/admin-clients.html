@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="/admin-nav.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Management - Leadex Admin</title>
+    <style>
+        .content-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .clients-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .client-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .client-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .client-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .client-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .client-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .client-info {
+            margin-bottom: 15px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .info-label {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        .client-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #333;
+            font-size: 22px;
+        }
+
+        .modal-close {
+            font-size: 28px;
+            font-weight: bold;
+            color: #999;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            color: #333;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .form-section {
+            margin-bottom: 25px;
+        }
+
+        .form-section h3 {
+            font-size: 16px;
+            color: #667eea;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-group label .required {
+            color: #dc3545;
+            margin-left: 3px;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .checkbox-label:hover {
+            background: #e9ecef;
+        }
+
+        .modal-footer {
+            padding: 20px 30px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .success-message {
+            color: #28a745;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="content-header">
+        <h1>Client Management</h1>
+        <div class="breadcrumb">Home / Clients</div>
+    </div>
+
+    <div class="content-body">
+        <div class="content-card">
+            <div class="toolbar">
+                <h2 style="margin: 0;">Clients</h2>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-primary" style="display:none;" onclick="openPercentileManager()" style="background: #764ba2;">📊 Manage Distribution</button>
+                    <button class="btn btn-primary" onclick="createClient()">+ Add New Client</button>
+                </div>
+            </div>
+
+            <div class="clients-grid" id="clientsGrid">
+                <p style="text-align: center; color: #666; padding: 40px;">Loading clients...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Client Modal -->
+    <div id="clientModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Client</h2>
+                <button class="modal-close" onclick="closeClientModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="clientForm">
+                    <input type="hidden" id="clientId">
+
+                    <div class="form-section">
+                        <h3>Basic Information</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Name <span class="required">*</span></label>
+                                <input type="text" id="clientName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Status</label>
+                                <select id="clientStatus">
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="clientEmail">
+                            </div>
+                            <div class="form-group">
+                                <label>Phone Number</label>
+                                <input type="tel" id="clientPhone">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Lead Distribution & Credits</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Percentage Allocation <span class="required">*</span></label>
+                                <input type="number" id="clientPercentage" min="0" max="100" step="0.1" required>
+                                <small style="color: #666; font-size: 12px;">% of leads to receive</small>
+                            </div>
+                            <div class="form-group" style="display:none;">
+                                <label>Priority Order</label>
+                                <input type="number" id="clientPriority" min="0" value="0">
+                                <small style="color: #666; font-size: 12px;">Lower = higher priority</small>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Credits Balance</label>
+                                <input type="number" id="clientCredits" min="0" step="0.01" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Cost Per Lead</label>
+                                <input type="number" id="clientCostPerLead" min="0.01" step="0.01" value="1.00">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Delivery Methods</h3>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="acceptWebhook">
+                                <span>🔗 Webhook</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="acceptEmail">
+                                <span>📧 Email</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="acceptSMS">
+                                <span>📱 SMS</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="acceptSheets">
+                                <span>📊 Google Sheets</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Integration Settings</h3>
+                        <div class="form-row full">
+                            <div class="form-group">
+                                <label>Webhook URL</label>
+                                <input type="url" id="webhookUrl" placeholder="https://your-domain.com/webhook">
+                            </div>
+                        </div>
+                        <div class="form-row full">
+                            <div class="form-group">
+                                <label>Google Sheet URL or ID</label>
+                                <input type="text" id="googleSheetId" placeholder="https://docs.google.com/spreadsheets/d/... or just the ID">
+                                <small style="color: #666; font-size: 11px;">You can paste the full Google Sheets URL or just the spreadsheet ID</small>
+                            </div>
+                        </div>
+                    <div class="form-row full">
+  <div class="form-group">
+    <label>WhatsApp Details (Rich Text)</label>
+    <textarea id="whatsappDetailsRichtext"
+              rows="6"
+              placeholder="متن چندخطی برای ارسال روی واتساپ (RTL)"
+              style="padding: 10px 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; resize: vertical; direction: rtl; text-align: right;"></textarea>
+    <small style="color: #666; font-size: 11px;">این متن در دیتابیس ذخیره می‌شود و می‌تواند چندخطی باشد.</small>
+  </div>
+</div>                
+    </div>
+                
+                    <div id="formError" class="error-message" style="display: none;"></div>
+                    <div id="formSuccess" class="success-message" style="display: none;"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-cancel" onclick="closeClientModal()">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveClient()">Save Client</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Credits Modal -->
+    <div id="creditsModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2>Manage Credits</h2>
+                <button class="modal-close" onclick="closeCreditsModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="currentCreditsText" style="font-size: 18px; color: #333; margin-bottom: 20px;"></p>
+                <div class="form-group">
+                    <label>Add Credits</label>
+                    <input type="number" id="creditsToAdd" min="0.01" step="0.01" placeholder="0.00">
+                </div>
+                <div id="creditsError" class="error-message" style="display: none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-cancel" onclick="closeCreditsModal()">Cancel</button>
+                <button type="button" class="btn btn-success" onclick="addCreditsToClient()">Add Credits</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Percentile Allocation Modal -->
+    <div id="percentileModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2>Lead Distribution Management</h2>
+                <button class="modal-close" onclick="closePercentileManager()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>Total Allocation:</strong>
+                            <span id="totalPercentage" style="font-size: 20px; margin-left: 10px; color: #667eea;">0%</span>
+                        </div>
+                        <div id="percentageWarning" style="color: #dc3545; font-weight: 600; display: none;">
+                            ⚠️ Total must equal 100%
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px; background: #e9ecef; border-radius: 10px; height: 30px; overflow: hidden; position: relative;">
+                        <div id="percentageBar" style="height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); transition: width 0.3s; width: 0%;"></div>
+                    </div>
+                </div>
+
+                <div id="percentileList" style="max-height: 400px; overflow-y: auto;">
+                    <p style="text-align: center; color: #666;">Loading clients...</p>
+                </div>
+
+                <div id="percentileError" class="error-message" style="display: none;"></div>
+                <div id="percentileSuccess" class="success-message" style="display: none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-cancel" onclick="closePercentileManager()">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="savePercentileAllocations()">Save Distribution</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Client Details Modal -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2 id="detailsClientName">Client Details</h2>
+                <button class="modal-close" onclick="closeClientDetails()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Client Info Summary -->
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px;">
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                        <div style="font-size: 12px; color: #666; margin-bottom: 5px;">Total Leads</div>
+                        <div id="detailsTotalLeads" style="font-size: 24px; font-weight: 600; color: #667eea;">0</div>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                        <div style="font-size: 12px; color: #666; margin-bottom: 5px;">Credits Balance</div>
+                        <div id="detailsCredits" style="font-size: 24px; font-weight: 600; color: #28a745;">0.00</div>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                        <div style="font-size: 12px; color: #666; margin-bottom: 5px;">Allocation</div>
+                        <div id="detailsPercentage" style="font-size: 24px; font-weight: 600; color: #764ba2;">0%</div>
+                    </div>
+                </div>
+
+                <!-- Client Portal Access Credentials -->
+                <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 20px; margin-bottom: 25px;">
+                    <h3 style="font-size: 16px; color: #856404; margin-bottom: 15px;">🔐 Client Portal Access</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <div style="font-size: 12px; color: #856404; margin-bottom: 5px; font-weight: 600;">Access Token</div>
+                            <div style="display: flex; gap: 5px; align-items: center;">
+                                <input type="text" id="detailsToken" readonly style="flex: 1; padding: 8px; border: 1px solid #ffc107; border-radius: 4px; background: white; font-family: monospace; font-size: 12px;" />
+                                <button onclick="copyToClipboard('detailsToken')" style="padding: 8px 12px; background: #ffc107; border: none; border-radius: 4px; cursor: pointer;">📋</button>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: #856404; margin-bottom: 5px; font-weight: 600;">Password</div>
+                            <div style="display: flex; gap: 5px; align-items: center;">
+                                <input type="text" id="detailsPassword" readonly style="flex: 1; padding: 8px; border: 1px solid #ffc107; border-radius: 4px; background: white; font-family: monospace; font-size: 12px;" />
+                                <button onclick="copyToClipboard('detailsPassword')" style="padding: 8px 12px; background: #ffc107; border: none; border-radius: 4px; cursor: pointer;">📋</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 11px; color: #856404;">
+                        <strong>Portal URL:</strong> <a href="/client-login.html" target="_blank" style="color: #856404; text-decoration: underline;">/client-login.html</a>
+                    </div>
+                </div>
+
+                <!-- Recent Lead History -->
+                <div style="margin-bottom: 15px;">
+                    <h3 style="font-size: 16px; color: #333; margin-bottom: 10px;">Recent Lead History</h3>
+                </div>
+
+                <div id="detailsLeadHistory" style="max-height: 400px; overflow-y: auto;">
+                    <p style="text-align: center; color: #666; padding: 20px;">Loading lead history...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-cancel" onclick="closeClientDetails()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/admin';
+
+        function getToken() {
+            return localStorage.getItem('admin_token');
+        }
+
+        async function fetchWithAuth(url, options = {}) {
+            const token = getToken();
+            if (!token) {
+                window.location.href = '/admin-login.html';
+                return;
+            }
+
+            const headers = {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+
+            return fetch(url, { ...options, headers });
+        }
+
+        async function loadClients() {
+            try {
+                const response = await fetchWithAuth(`${API_BASE}/clients/`);
+                if (!response) return; // No token, redirected to login
+
+                if (!response.ok) {
+                    console.error('Failed to load clients:', response.status);
+                    return;
+                }
+
+                const clients = await response.json();
+                const grid = document.getElementById('clientsGrid');
+
+                if (!clients || clients.length === 0) {
+                    grid.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">No clients found. Click "Add New Client" to create one.</p>';
+                    return;
+                }
+
+                grid.innerHTML = clients.map(client => `
+                    <div class="client-card" data-client-id="${client.id}" data-credits="${client.credits_balance}">
+                        <div class="client-header">
+                            <div class="client-name">${client.name}</div>
+                            <div class="client-status status-${client.status}">${client.status.toUpperCase()}</div>
+                        </div>
+                        <div class="client-info">
+                            <div class="info-row">
+                                <span class="info-label">Email:</span>
+                                <span class="info-value">${client.email || '-'}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Phone:</span>
+                                <span class="info-value">${client.phone_number || '-'}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Credits:</span>
+                                <span class="info-value">${client.credits_balance.toFixed(2)}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Percentage:</span>
+                                <span class="info-value">${client.percentage}%</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Methods:</span>
+                                <span class="info-value">
+                                    ${client.accept_webhook ? '🔗' : ''}
+                                    ${client.accept_email ? '📧' : ''}
+                                    ${client.accept_sms ? '📱' : ''}
+                                    ${client.accept_sheets ? '📊' : ''}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="client-actions">
+                            <button class="btn btn-success btn-sm" onclick='viewClientDetails("${client.id}")'>Details</button>
+                            <button class="btn btn-success btn-sm" onclick='editClient("${client.id}")'>Edit</button>
+                            <button class="btn btn-warning btn-sm" onclick='manageCredits("${client.id}")'>Credits</button>
+                            <button class="btn btn-danger btn-sm" onclick='deleteClient("${client.id}")'>Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading clients:', error);
+                document.getElementById('clientsGrid').innerHTML = '<p style="text-align: center; color: #dc3545; padding: 40px;">Error loading clients</p>';
+            }
+        }
+
+        // Modal Management
+        let currentClientId = null;
+        let currentCreditsClientId = null;
+
+        function createClient() {
+            currentClientId = null;
+            document.getElementById('modalTitle').textContent = 'Add New Client';
+            document.getElementById('clientForm').reset();
+            document.getElementById('clientId').value = '';
+            document.getElementById('clientStatus').value = 'active';
+            document.getElementById('formError').style.display = 'none';
+            document.getElementById('formSuccess').style.display = 'none';
+            document.getElementById('clientModal').classList.add('show');
+        }
+
+        function closeClientModal() {
+            document.getElementById('clientModal').classList.remove('show');
+        }
+
+        async function editClient(clientId) {
+            try {
+                const response = await fetchWithAuth(`${API_BASE}/clients/${clientId}`);
+                if (!response.ok) throw new Error('Failed to fetch client');
+
+                const client = await response.json();
+
+                currentClientId = clientId;
+                document.getElementById('modalTitle').textContent = 'Edit Client';
+                document.getElementById('clientId').value = client.id;
+                document.getElementById('clientName').value = client.name || '';
+                document.getElementById('clientEmail').value = client.email || '';
+                document.getElementById('clientPhone').value = client.phone_number || '';
+                document.getElementById('clientPercentage').value = client.percentage || 0;
+                document.getElementById('clientPriority').value = client.priority_order || 0;
+                document.getElementById('clientCredits').value = client.credits_balance || 0;
+                document.getElementById('clientCostPerLead').value = client.credit_cost_per_lead || 1.0;
+                document.getElementById('clientStatus').value = client.status || 'active';
+                document.getElementById('acceptWebhook').checked = client.accept_webhook || false;
+                document.getElementById('acceptEmail').checked = client.accept_email || false;
+                document.getElementById('acceptSMS').checked = client.accept_sms || false;
+                document.getElementById('acceptSheets').checked = client.accept_sheets || false;
+                document.getElementById('webhookUrl').value = client.webhook_url || '';
+                document.getElementById('googleSheetId').value = client.google_sheet_id || '';
+               document.getElementById('whatsappDetailsRichtext').value = client.whatsapp_details_richtext || '';
+                document.getElementById('formError').style.display = 'none';
+                document.getElementById('formSuccess').style.display = 'none';
+                document.getElementById('clientModal').classList.add('show');
+            } catch (error) {
+                console.error('Error loading client:', error);
+                alert('Failed to load client details');
+            }
+        }
+
+        async function saveClient() {
+            const formError = document.getElementById('formError');
+            const formSuccess = document.getElementById('formSuccess');
+            formError.style.display = 'none';
+            formSuccess.style.display = 'none';
+
+            // Validate required fields
+            const name = document.getElementById('clientName').value.trim();
+            const percentage = parseFloat(document.getElementById('clientPercentage').value);
+
+            if (!name) {
+                formError.textContent = 'Client name is required';
+                formError.style.display = 'block';
+                return;
+            }
+
+            if (isNaN(percentage) || percentage < 0 || percentage > 100) {
+                formError.textContent = 'Percentage must be between 0 and 100';
+                formError.style.display = 'block';
+                return;
+            }
+
+            // Build request data
+            const clientData = {
+                name: name,
+                email: document.getElementById('clientEmail').value.trim() || null,
+                phone_number: document.getElementById('clientPhone').value.trim() || null,
+                percentage: percentage,
+                priority_order: parseInt(document.getElementById('clientPriority').value) || 0,
+                credits_balance: parseFloat(document.getElementById('clientCredits').value) || 0,
+                credit_cost_per_lead: parseFloat(document.getElementById('clientCostPerLead').value) || 1.0,
+                status: document.getElementById('clientStatus').value,
+                accept_webhook: document.getElementById('acceptWebhook').checked,
+                accept_email: document.getElementById('acceptEmail').checked,
+                accept_sms: document.getElementById('acceptSMS').checked,
+                accept_sheets: document.getElementById('acceptSheets').checked,
+                webhook_url: document.getElementById('webhookUrl').value.trim() || null,
+                google_sheet_id: extractGoogleSheetId(document.getElementById('googleSheetId').value.trim()) || null,
+              whatsapp_details_richtext: document.getElementById('whatsappDetailsRichtext').value || null
+            };
+
+            try {
+                let response;
+                if (currentClientId) {
+                    // Update existing client
+                    response = await fetchWithAuth(`${API_BASE}/clients/${currentClientId}`, {
+                        method: 'PUT',
+                        body: JSON.stringify(clientData)
+                    });
+                } else {
+                    // Create new client
+                    response = await fetchWithAuth(`${API_BASE}/clients/`, {
+                        method: 'POST',
+                        body: JSON.stringify(clientData)
+                    });
+                }
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Failed to save client');
+                }
+
+                formSuccess.textContent = currentClientId ? 'Client updated successfully!' : 'Client created successfully!';
+                formSuccess.style.display = 'block';
+
+                setTimeout(() => {
+                    closeClientModal();
+                    loadClients();
+                }, 1500);
+
+            } catch (error) {
+                console.error('Error saving client:', error);
+                formError.textContent = error.message || 'Failed to save client';
+                formError.style.display = 'block';
+            }
+        }
+
+        async function deleteClient(clientId) {
+            if (!confirm('Are you sure you want to delete this client? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const response = await fetchWithAuth(`${API_BASE}/clients/${clientId}`, {
+                    method: 'DELETE'
+                });
+
+                // 204 No Content is success
+                if (response && (response.ok || response.status === 204)) {
+                    alert('Client deleted successfully');
+                    await loadClients();
+                } else {
+                    throw new Error('Failed to delete client');
+                }
+            } catch (error) {
+                console.error('Error deleting client:', error);
+                alert('Failed to delete client: ' + error.message);
+            }
+        }
+
+        // Credits Management
+        function manageCredits(clientId) {
+            currentCreditsClientId = clientId;
+
+            // Find the client in the current list to show current balance
+            const clientCard = document.querySelector(`[data-client-id="${clientId}"]`);
+            const currentBalance = clientCard ? clientCard.dataset.credits : '0.00';
+
+            document.getElementById('currentCreditsText').textContent = `Current Balance: ${parseFloat(currentBalance).toFixed(2)} credits`;
+            document.getElementById('creditsToAdd').value = '';
+            document.getElementById('creditsError').style.display = 'none';
+            document.getElementById('creditsModal').classList.add('show');
+        }
+
+        function closeCreditsModal() {
+            document.getElementById('creditsModal').classList.remove('show');
+        }
+
+        async function addCreditsToClient() {
+            const creditsError = document.getElementById('creditsError');
+            creditsError.style.display = 'none';
+
+            const creditsToAdd = parseFloat(document.getElementById('creditsToAdd').value);
+
+            if (isNaN(creditsToAdd) || creditsToAdd <= 0) {
+                creditsError.textContent = 'Please enter a valid amount greater than 0';
+                creditsError.style.display = 'block';
+                return;
+            }
+
+            try {
+                const response = await fetchWithAuth(`${API_BASE}/clients/${currentCreditsClientId}/credits?credits=${creditsToAdd}`, {
+                    method: 'POST'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to add credits');
+                }
+
+                closeCreditsModal();
+                await loadClients();
+            } catch (error) {
+                console.error('Error adding credits:', error);
+                creditsError.textContent = 'Failed to add credits';
+                creditsError.style.display = 'block';
+            }
+        }
+
+        // Client Details Management
+        async function viewClientDetails(clientId) {
+            try {
+                // Fetch client details
+                const clientResponse = await fetchWithAuth(`${API_BASE}/clients/${clientId}`);
+                if (!clientResponse.ok) throw new Error('Failed to fetch client');
+                const client = await clientResponse.json();
+
+                // Fetch leads (with delivery info) for this client
+                const leadsResponse = await fetchWithAuth(`${API_BASE}/leads/?client_id=${clientId}&limit=50`);
+                let leads = [];
+                if (leadsResponse.ok) {
+                    const leadsData = await leadsResponse.json();
+                    leads = leadsData.leads || [];
+                }
+
+                // Update modal with client info
+                document.getElementById('detailsClientName').textContent = client.name;
+                document.getElementById('detailsTotalLeads').textContent = leads.length;
+                document.getElementById('detailsCredits').textContent = client.credits_balance.toFixed(2);
+                document.getElementById('detailsPercentage').textContent = client.percentage + '%';
+
+                // Update access credentials
+                document.getElementById('detailsToken').value = client.password_protected_link_token || 'Not generated';
+                document.getElementById('detailsPassword').value = client.password || 'Not set';
+
+                // Render lead history
+                const historyContainer = document.getElementById('detailsLeadHistory');
+
+                if (leads.length === 0) {
+                    historyContainer.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">No leads delivered to this client yet.</p>';
+                } else {
+                    historyContainer.innerHTML = `
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f8f9fa; border-bottom: 2px solid #e0e0e0;">
+                                    <th style="padding: 12px; text-align: left; font-size: 12px; color: #666;">Date</th>
+                                    <th style="padding: 12px; text-align: left; font-size: 12px; color: #666;">Lead</th>
+                                    <th style="padding: 12px; text-align: left; font-size: 12px; color: #666;">Status</th>
+                                    <th style="padding: 12px; text-align: left; font-size: 12px; color: #666;">Source</th>
+                                    <th style="padding: 12px; text-align: left; font-size: 12px; color: #666;">Delivered</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${leads.map(lead => {
+                                    const date = new Date(lead.created_at).toLocaleDateString();
+                                    const time = new Date(lead.created_at).toLocaleTimeString();
+                                    const statusColor = lead.status === 'distributed' ? '#28a745' :
+                                                       lead.status === 'pending' ? '#ffc107' : '#666';
+
+                                    return `
+                                        <tr style="border-bottom: 1px solid #f0f0f0;">
+                                            <td style="padding: 12px; font-size: 13px;">
+                                                <div>${date}</div>
+                                                <div style="font-size: 11px; color: #999;">${time}</div>
+                                            </td>
+                                            <td style="padding: 12px; font-size: 13px;">
+                                                <div style="font-weight: 500;">${lead.name || 'N/A'}</div>
+                                                <div style="font-size: 11px; color: #666;">${lead.email || lead.phone_number || '-'}</div>
+                                            </td>
+                                            <td style="padding: 12px;">
+                                                <span style="background: ${statusColor}; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">
+                                                    ${lead.status}
+                                                </span>
+                                            </td>
+                                            <td style="padding: 12px; font-size: 13px;">
+                                                ${lead.source || 'Unknown'}
+                                            </td>
+                                            <td style="padding: 12px; font-size: 11px; color: #666;">
+                                                ${lead.delivery_count || 0} time(s)
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                }
+
+                document.getElementById('detailsModal').classList.add('show');
+
+            } catch (error) {
+                console.error('Error loading client details:', error);
+                alert('Failed to load client details');
+            }
+        }
+
+        function closeClientDetails() {
+            document.getElementById('detailsModal').classList.remove('show');
+        }
+
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            element.select();
+            element.setSelectionRange(0, 99999); // For mobile devices
+            navigator.clipboard.writeText(element.value).then(() => {
+                // Visual feedback
+                const originalBg = element.style.background;
+                element.style.background = '#d4edda';
+                setTimeout(() => {
+                    element.style.background = originalBg;
+                }, 200);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy to clipboard');
+            });
+        }
+
+        function extractGoogleSheetId(input) {
+            if (!input) return null;
+
+            // If it's already just an ID (no slashes), return it
+            if (!input.includes('/')) {
+                return input;
+            }
+
+            // Extract ID from URL: https://docs.google.com/spreadsheets/d/SHEET_ID/edit...
+            const match = input.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+            if (match && match[1]) {
+                return match[1];
+            }
+
+            // If no match, return the original input (might still be valid)
+            return input;
+        }
+
+        // Percentile Allocation Management
+        let percentileClients = [];
+
+        async function openPercentileManager() {
+            try {
+                const response = await fetchWithAuth(`${API_BASE}/clients/`);
+                if (!response || !response.ok) {
+                    alert('Failed to load clients');
+                    return;
+                }
+
+                percentileClients = await response.json();
+
+                if (percentileClients.length === 0) {
+                    alert('No clients found. Please create clients first.');
+                    return;
+                }
+
+                renderPercentileList();
+                updatePercentileTotal();
+                document.getElementById('percentileError').style.display = 'none';
+                document.getElementById('percentileSuccess').style.display = 'none';
+                document.getElementById('percentileModal').classList.add('show');
+            } catch (error) {
+                console.error('Error loading clients for percentile:', error);
+                alert('Failed to load clients');
+            }
+        }
+
+        function closePercentileManager() {
+            document.getElementById('percentileModal').classList.remove('show');
+        }
+
+        function renderPercentileList() {
+            const list = document.getElementById('percentileList');
+
+            list.innerHTML = percentileClients.map(client => `
+                <div style="background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; color: #333; margin-bottom: 5px;">${client.name}</div>
+                            <div style="font-size: 12px; color: #666;">
+                                ${client.email || 'No email'} | Priority: ${client.priority_order || 0}
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input
+                                type="number"
+                                id="percent_${client.id}"
+                                value="${client.percentage}"
+                                min="0"
+                                max="100"
+                                step="0.1"
+                                onchange="updatePercentileTotal()"
+                                style="width: 80px; padding: 8px; border: 1px solid #ddd; border-radius: 5px; text-align: center; font-size: 16px; font-weight: 600;"
+                            >
+                            <span style="font-size: 18px; color: #667eea; font-weight: 600;">%</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updatePercentileTotal() {
+            let total = 0;
+            percentileClients.forEach(client => {
+                const input = document.getElementById(`percent_${client.id}`);
+                if (input) {
+                    total += parseFloat(input.value) || 0;
+                }
+            });
+
+            const totalElement = document.getElementById('totalPercentage');
+            const warningElement = document.getElementById('percentageWarning');
+            const barElement = document.getElementById('percentageBar');
+
+            totalElement.textContent = total.toFixed(1) + '%';
+            barElement.style.width = Math.min(total, 100) + '%';
+
+            if (Math.abs(total - 100) > 0.1) {
+                warningElement.style.display = 'block';
+                totalElement.style.color = '#dc3545';
+                barElement.style.background = '#dc3545';
+            } else {
+                warningElement.style.display = 'none';
+                totalElement.style.color = '#28a745';
+                barElement.style.background = 'linear-gradient(90deg, #667eea, #764ba2)';
+            }
+        }
+
+        async function savePercentileAllocations() {
+            const percentileError = document.getElementById('percentileError');
+            const percentileSuccess = document.getElementById('percentileSuccess');
+            percentileError.style.display = 'none';
+            percentileSuccess.style.display = 'none';
+
+            // Calculate total
+            let total = 0;
+            const updates = [];
+
+            for (const client of percentileClients) {
+                const input = document.getElementById(`percent_${client.id}`);
+                const percentage = parseFloat(input.value) || 0;
+                total += percentage;
+                updates.push({
+                    id: client.id,
+                    percentage: percentage
+                });
+            }
+
+            // Validate total
+            if (Math.abs(total - 100) > 0.1) {
+                percentileError.textContent = `Total allocation is ${total.toFixed(1)}%. It must equal 100%.`;
+                percentileError.style.display = 'block';
+                return;
+            }
+
+            // Save each client's percentage
+            try {
+                for (const update of updates) {
+                    const response = await fetchWithAuth(`${API_BASE}/clients/${update.id}`, {
+                        method: 'PUT',
+                        body: JSON.stringify({ percentage: update.percentage })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Failed to update ${update.id}`);
+                    }
+                }
+
+                percentileSuccess.textContent = 'Distribution updated successfully!';
+                percentileSuccess.style.display = 'block';
+
+                setTimeout(() => {
+                    closePercentileManager();
+                    loadClients();
+                }, 1500);
+
+            } catch (error) {
+                console.error('Error saving percentiles:', error);
+                percentileError.textContent = 'Failed to save distribution. Please try again.';
+                percentileError.style.display = 'block';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadClients();
+
+            // Auto-refresh every 20 seconds
+            startAutoRefresh(loadClients, 20000);
+        });
+    </script>
+</body>
+</html>
+

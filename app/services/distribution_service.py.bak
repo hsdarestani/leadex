@@ -1,0 +1,345 @@
+"""
+Distribution Service - Core distribution logic
+Handles percentage-based allocation, credit checking, and lead assignment
+"""
+from typing import List, Dict, Tuple, Optional
+from sqlalchemy.orm import Session
+from sqlalchemy import and_
+from app.models import Client, Asset, StoredLead, Delivery
+from app.core.config import settings
+from app.services.credit_service import CreditService
+import logging
+import uuid
+from datetime import datetime
+
+logger = logging.getLogger(__name__)
+
+
+class DistributionService:
+    """Service for distributing leads to clients based on percentages and credits"""
+    
+    @staticmethod
+    def get_active_clients(db: Session) -> List[Client]:
+        """
+        Get all active clients with percentage > 0, ordered by priority
+        
+        Args:
+            db: Database session
+            
+        Returns:
+            List of active clients
+        """
+        return db.query(Client).filter(
+            and_(
+                Client.status == "active",
+                Client.percentage > 0
+            )
+        ).order_by(Client.priority_order.asc()).all()
+    
+    @staticmethod
+    def calculate_allocation(clients: List[Client], batch_size: int = 10) -> Dict[uuid.UUID, int]:
+        """
+        Calculate how many leads each client should receive based on percentage
+        
+        Args:
+            clients: List of active clients
+            batch_size: Number of leads to distribute (default: 10)
+            
+        Returns:
+            Dictionary mapping client_id to number of leads allocated
+            
+        Example:
+            Client A: 30% -> 3 leads
+            Client B: 20% -> 2 leads
+            Client C: 50% -> 5 leads
+        """
+        allocation = {}
+        total_percentage = sum(client.percentage for client in clients)
+        
+        if total_percentage == 0:
+            logger.warning("Total percentage is 0, no allocation possible")
+            return allocation
+        
+        # Calculate allocation based on percentage
+        remaining_leads = batch_size
+        
+        for client in clients:
+            # Calculate proportional allocation
+            if total_percentage > 0:
+                allocated = int((client.percentage / total_percentage) * batch_size)
+            else:
+                allocated = 0
+            
+            allocation[client.id] = allocated
+            remaining_leads -= allocated
+        
+        # Distribute remaining leads (due to rounding) to clients with highest percentage
+        if remaining_leads > 0:
+            # Sort clients by percentage descending
+            sorted_clients = sorted(clients, key=lambda c: c.percentage, reverse=True)
+            for i in range(remaining_leads):
+                client = sorted_clients[i % len(sorted_clients)]
+                allocation[client.id] += 1
+        
+        logger.info(f"Allocation calculated: {allocation}")
+        return allocation
+    
+    @staticmethod
+    def check_client_credits(client: Client, allocated_leads: int) -> Tuple[int, bool]:
+        """
+        Check if client has enough credits for allocated leads
+        
+        Args:
+            client: Client object
+            allocated_leads: Number of leads allocated to this client
+            
+        Returns:
+            Tuple of (leads_client_can_afford, has_full_credits)
+            
+        Example:
+            Allocated 3 leads, client has 2 credits -> (2, False)
+            Allocated 3 leads, client has 5 credits -> (3, True)
+        """
+        required_credits = allocated_leads * client.credit_cost_per_lead
+        available_credits = client.credits_balance
+        
+        if available_credits >= required_credits:
+            # Client has enough credits
+            return allocated_leads, True
+        elif available_credits > 0:
+            # Client has partial credits
+            affordable_leads = int(available_credits / client.credit_cost_per_lead)
+            return affordable_leads, False
+        else:
+            # Client has no credits
+            return 0, False
+    
+    @staticmethod
+    def redistribute_leads(
+        original_allocation: Dict[uuid.UUID, int],
+        clients: List[Client],
+        db: Session
+    ) -> Dict[uuid.UUID, int]:
+        """
+        Redistribute leads when clients don't have enough credits
+        
+        Args:
+            original_allocation: Original allocation based on percentages
+            clients: List of active clients
+            db: Database session
+            
+        Returns:
+            Final allocation after credit checking and redistribution
+        """
+        final_allocation = {}
+        leads_to_redistribute = []
+        
+        # First pass: Check credits and collect leads to redistribute
+        for client in clients:
+            client_id = client.id
+            allocated = original_allocation.get(client_id, 0)
+
+            if allocated == 0:
+                continue
+
+            affordable, has_full_credits = DistributionService.check_client_credits(client, allocated)
+
+            if affordable > 0:
+                final_allocation[client_id] = affordable
+                logger.info(f"Client {client.name} can afford {affordable}/{allocated} leads")
+
+            if not has_full_credits:
+                # Client can't afford all allocated leads
+                unaffordable = allocated - affordable
+                leads_to_redistribute.extend([client_id] * unaffordable)
+                logger.warning(f"Client {client.name} short {unaffordable} credits, redistributing")
+
+        # Second pass: Redistribute unaffordable leads to clients with credits
+        if leads_to_redistribute:
+            logger.info(f"Redistributing {len(leads_to_redistribute)} leads")
+
+            # Get clients with available credits (sorted by percentage)
+            clients_with_credits = [
+                c for c in sorted(clients, key=lambda x: x.percentage, reverse=True)
+                if c.credits_balance >= c.credit_cost_per_lead
+            ]
+
+            if not clients_with_credits:
+                logger.warning("No clients with credits available for redistribution")
+                return final_allocation
+
+            # Distribute to clients with credits in round-robin fashion
+            for i, _ in enumerate(leads_to_redistribute):
+                client = clients_with_credits[i % len(clients_with_credits)]
+
+                # Check if client still has credits
+                current_allocation = final_allocation.get(client.id, 0)
+                total_needed = (current_allocation + 1) * client.credit_cost_per_lead
+
+                if client.credits_balance >= total_needed:
+                    final_allocation[client.id] = current_allocation + 1
+                    logger.info(f"Redistributed 1 lead to {client.name}")
+
+        return final_allocation
+
+    @staticmethod
+    def assign_leads_to_clients(
+        lead_ids: List[uuid.UUID],
+        allocation: Dict[uuid.UUID, int],
+        clients: List[Client],
+        db: Session
+    ) -> Dict[str, any]:
+        """
+        Assign leads to clients based on final allocation
+
+        Args:
+            lead_ids: List of lead IDs to distribute
+            allocation: Final allocation (client_id -> number of leads)
+            clients: List of active clients
+            db: Database session
+
+        Returns:
+            Dictionary with assignment results
+        """
+        results = {
+            "assigned": 0,
+            "stored": 0,
+            "assignments": {},
+            "stored_lead_ids": []
+        }
+
+        # Create a mapping of client_id to client object
+        client_map = {client.id: client for client in clients}
+
+        # Track which leads have been assigned
+        assigned_lead_ids = []
+        lead_index = 0
+
+        # Assign leads based on allocation
+        for client_id, num_leads in allocation.items():
+            if num_leads == 0:
+                continue
+
+            client = client_map.get(client_id)
+            if not client:
+                logger.error(f"Client {client_id} not found in client map")
+                continue
+
+            # Get the leads for this client
+            client_lead_ids = lead_ids[lead_index:lead_index + num_leads]
+            lead_index += num_leads
+
+            # Assign each lead to the client
+            for lead_id in client_lead_ids:
+                # Update lead status
+                lead = db.query(Asset).filter(Asset.id == lead_id).first()
+                if lead:
+                    lead.status = "ASSIGNED"
+                    lead.updated_at = datetime.utcnow()
+
+                    # Create delivery record (status will be updated by delivery workers)
+                    delivery = Delivery(
+                        asset_id=lead_id,
+                        client_id=client_id,
+                        success=False,
+                        delivery_method="multiple",  # Will be updated by delivery workers
+                        attempt_number=1
+                    )
+                    db.add(delivery)
+                    assigned_lead_ids.append(lead_id)
+                    results["assigned"] += 1
+
+                    logger.info(f"Assigned lead {lead_id} to client {client.name}")
+
+            # Deduct credits for assigned leads
+            CreditService.reserve_credits(client, len(client_lead_ids), db)
+
+            results["assignments"][str(client_id)] = {
+                "client_name": client.name,
+                "leads_assigned": len(client_lead_ids),
+                "lead_ids": [str(lid) for lid in client_lead_ids]
+            }
+
+        # Store unassigned leads
+        unassigned_lead_ids = [lid for lid in lead_ids if lid not in assigned_lead_ids]
+
+        if unassigned_lead_ids:
+            logger.warning(f"Storing {len(unassigned_lead_ids)} unassigned leads (no credits)")
+
+            for lead_id in unassigned_lead_ids:
+                # Update lead status
+                lead = db.query(Asset).filter(Asset.id == lead_id).first()
+                if lead:
+                    lead.status = "STORED"
+                    lead.updated_at = datetime.utcnow()
+
+                # Create stored lead record
+                stored_lead = StoredLead(
+                    asset_id=lead_id,
+                    reason="no_credits",
+                    retry_count=0
+                )
+                db.add(stored_lead)
+                results["stored"] += 1
+                results["stored_lead_ids"].append(str(lead_id))
+
+        db.commit()
+
+        logger.info(f"Distribution complete: {results['assigned']} assigned, {results['stored']} stored")
+        return results
+
+    @staticmethod
+    def distribute_batch(lead_ids: List[uuid.UUID], db: Session) -> Dict[str, any]:
+        """
+        Main distribution function - orchestrates the entire distribution process
+
+        Args:
+            lead_ids: List of lead IDs to distribute (typically 10)
+            db: Database session
+
+        Returns:
+            Dictionary with distribution results
+        """
+        logger.info(f"Starting distribution for {len(lead_ids)} leads")
+
+        # 1. Get active clients
+        clients = DistributionService.get_active_clients(db)
+
+        if not clients:
+            logger.warning("No active clients found, storing all leads")
+            # Store all leads
+            for lead_id in lead_ids:
+                lead = db.query(Asset).filter(Asset.id == lead_id).first()
+                if lead:
+                    lead.status = "STORED"
+                    lead.updated_at = datetime.utcnow()
+
+                stored_lead = StoredLead(
+                    asset_id=lead_id,
+                    reason="no_active_clients",
+                    retry_count=0
+                )
+                db.add(stored_lead)
+
+            db.commit()
+
+            return {
+                "assigned": 0,
+                "stored": len(lead_ids),
+                "assignments": {},
+                "stored_lead_ids": [str(lid) for lid in lead_ids],
+                "reason": "no_active_clients"
+            }
+
+        # 2. Calculate allocation based on percentages
+        original_allocation = DistributionService.calculate_allocation(clients, len(lead_ids))
+
+        # 3. Check credits and redistribute
+        final_allocation = DistributionService.redistribute_leads(original_allocation, clients, db)
+
+        # 4. Assign leads to clients
+        results = DistributionService.assign_leads_to_clients(lead_ids, final_allocation, clients, db)
+
+        logger.info(f"Distribution results: {results}")
+        return results
+

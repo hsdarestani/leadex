@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="/admin-nav.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webhook Management - Leadex Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 28px;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .header-nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+
+        .header-nav a:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-logout {
+            background: #f56565;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: #e53e3e;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background: #5a67d8;
+        }
+
+        .btn:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .label {
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .logs-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .logs-table th,
+        .logs-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .logs-table th {
+            background: #f7fafc;
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .logs-table td {
+            font-size: 14px;
+            color: #2d3748;
+        }
+
+        .logs-table tr:hover {
+            background: #f7fafc;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .badge-error {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .badge-test {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+
+        .badge-production {
+            background: #feebc8;
+            color: #7c2d12;
+        }
+
+        .result-box {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .result-success {
+            border-color: #48bb78;
+            background: #f0fff4;
+        }
+
+        .result-error {
+            border-color: #f56565;
+            background: #fff5f5;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #718096;
+        }
+
+        .btn-view {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-view:hover {
+            background: #5a67d8;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            width: 90%;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            color: #2d3748;
+            font-size: 20px;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #718096;
+        }
+
+        .detail-row {
+            margin-bottom: 15px;
+        }
+
+        .detail-row label {
+            display: block;
+            color: #718096;
+            font-size: 12px;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .detail-row .value {
+            background: #f7fafc;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🔗 Webhook Management</h1>
+            <div class="user-info">
+                <div class="header-nav">
+                    <a href="/admin-dashboard.html">Dashboard</a>
+                <a href="/admin-leads.html">📊 Leads</a>
+                    <a href="/admin-analytics.html">Analytics</a>
+                    <a href="/admin-webhooks.html">Webhooks</a>
+                    <a href="/admin-imports.html">Imports</a>
+                    <a href="/admin-notifications.html">Notifications</a>
+                    <a href="/admin-advanced.html">Advanced</a>
+                </div>
+                <span id="userEmail"></span>
+                <button class="btn-logout" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="value" id="totalWebhooks">0</div>
+                <div class="label">Total Webhooks</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="successfulWebhooks">0</div>
+                <div class="label">Successful</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="failedWebhooks">0</div>
+                <div class="label">Failed</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="successRate">0%</div>
+                <div class="label">Success Rate</div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Webhook Tester -->
+            <div class="card">
+                <h2>🧪 Test Webhook</h2>
+                <form id="testForm" onsubmit="testWebhook(event)">
+                    <div class="form-group">
+                        <label>Client</label>
+                        <select id="clientSelect" required>
+                            <option value="">Select a client...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Webhook URL</label>
+                        <input type="url" id="webhookUrl" placeholder="https://example.com/webhook" required>
+                    </div>
+                    <div class="form-group">
+                        <label>HTTP Method</label>
+                        <select id="httpMethod">
+                            <option value="POST">POST</option>
+                            <option value="GET">GET</option>
+                            <option value="PUT">PUT</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Test Payload (JSON) - Optional</label>
+                        <textarea id="testPayload" placeholder='{"name": "Test Lead", "mobile": "+971501234567"}'></textarea>
+                    </div>
+                    <button type="submit" class="btn" id="testBtn">🚀 Send Test Request</button>
+                </form>
+                <div id="testResult"></div>
+            </div>
+
+            <!-- Recent Tests -->
+            <div class="card">
+                <h2>📋 Recent Test Results</h2>
+                <div id="recentTests" class="loading">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Webhook Logs -->
+        <div class="card full-width">
+            <h2>📊 Webhook Logs</h2>
+            <div style="margin-bottom: 15px; display: flex; gap: 10px;">
+                <select id="filterClient" onchange="loadLogs()">
+                    <option value="">All Clients</option>
+                </select>
+                <select id="filterSuccess" onchange="loadLogs()">
+                    <option value="">All Status</option>
+                    <option value="true">Success Only</option>
+                    <option value="false">Failed Only</option>
+                </select>
+                <select id="filterTest" onchange="loadLogs()">
+                    <option value="">All Types</option>
+                    <option value="true">Test Only</option>
+                    <option value="false">Production Only</option>
+                </select>
+            </div>
+            <div id="logsTable"></div>
+        </div>
+    </div>
+
+    <!-- Modal for Log Details -->
+    <div id="logModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Webhook Log Details</h3>
+                <button class="btn-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="logDetails"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/admin';
+        let token = localStorage.getItem('admin_token');
+        let clients = [];
+
+        // Check authentication
+        if (!token) {
+            window.location.href = '/admin-login.html';
+        }
+
+        // Fetch with auth
+        async function fetchWithAuth(url, options = {}) {
+            const headers = {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+
+            const response = await fetch(url, { ...options, headers });
+
+            if (response.status === 401) {
+                localStorage.removeItem('admin_token');
+                window.location.href = '/admin-login.html';
+                return;
+            }
+
+            return response;
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('admin_token');
+            window.location.href = '/admin-login.html';
+        }
+
+        // Load clients
+        async function loadClients() {
+            try {
+                const response = await fetchWithAuth(`${API_BASE}/clients/`);
+                clients = await response.json();
+
+                const clientSelect = document.getElementById('clientSelect');
+                const filterClient = document.getElementById('filterClient');
+
+                clients.forEach(client => {
+                    const option1 = document.createElement('option');
+                    option1.value = client.id;
+                    option1.textContent = client.name;
+                    clientSelect.appendChild(option1);
+
+                    const option2 = document.createElement('option');
+                    option2.value = client.id;
+                    option2.textContent = client.name;
+                    filterClient.appendChild(option2);
+                });
+            } catch (error) {
+                console.error('Error loading clients:', error);
+            }
+        }
+
+        // Load webhook stats
+        async function loadStats() {
+            try {
+                const response = await fetchWithAuth(`${API_BASE}/webhooks/stats`);
+                const stats = await response.json();
+
+                document.getElementById('totalWebhooks').textContent = stats.total_webhooks;
+                document.getElementById('successfulWebhooks').textContent = stats.successful_webhooks;
+                document.getElementById('failedWebhooks').textContent = stats.failed_webhooks;
+                document.getElementById('successRate').textContent = stats.success_rate + '%';
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Test webhook
+        async function testWebhook(event) {
+            event.preventDefault();
+
+            const btn = document.getElementById('testBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Sending...';
+
+            const clientId = document.getElementById('clientSelect').value;
+            const webhookUrl = document.getElementById('webhookUrl').value;
+            const method = document.getElementById('httpMethod').value;
+            const payloadText = document.getElementById('testPayload').value;
+
+            let testPayload = null;
+            if (payloadText.trim()) {
+                try {
+                    testPayload = JSON.parse(payloadText);
+                } catch (e) {
+                    alert('Invalid JSON payload');
+                    btn.disabled = false;
+                    btn.textContent = '🚀 Send Test Request';
+                    return;
+                }
+            }
+
+            try {
+                const response = await fetchWithAuth(`${API_BASE}/webhooks/test`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        client_id: clientId,
+                        webhook_url: webhookUrl,
+                        method: method,
+                        test_payload: testPayload
+                    })
+                });
+
+                const result = await response.json();
+
+                const resultDiv = document.getElementById('testResult');
+                const isSuccess = result.success;
+
+                resultDiv.className = `result-box ${isSuccess ? 'result-success' : 'result-error'}`;
+                resultDiv.innerHTML = `
+                    <div><strong>Status:</strong> ${isSuccess ? '✅ Success' : '❌ Failed'}</div>
+                    <div><strong>Status Code:</strong> ${result.status_code || 'N/A'}</div>
+                    <div><strong>Response Time:</strong> ${result.response_time_ms}ms</div>
+                    ${result.error_message ? `<div><strong>Error:</strong> ${result.error_message}</div>` : ''}
+                    ${result.response_body ? `<div><strong>Response:</strong><pre>${result.response_body.substring(0, 500)}</pre></div>` : ''}
+                `;
+
+                // Reload stats and logs
+                loadStats();
+                loadRecentTests();
+                loadLogs();
+
+            } catch (error) {
+                alert('Error testing webhook: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🚀 Send Test Request';
+            }
+        }
+
+        // Load recent tests
+        async function loadRecentTests() {
+            try {
+                const response = await fetchWithAuth(`${API_BASE}/webhooks/logs?is_test=true&limit=5`);
+                const logs = await response.json();
+
+                const container = document.getElementById('recentTests');
+
+                if (logs.length === 0) {
+                    container.innerHTML = '<div class="loading">No test results yet</div>';
+                    return;
+                }
+
+                container.innerHTML = logs.map(log => `
+                    <div style="padding: 10px; border-bottom: 1px solid #e2e8f0;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <strong>${log.client_name}</strong>
+                            <span class="badge ${log.success ? 'badge-success' : 'badge-error'}">
+                                ${log.success ? 'Success' : 'Failed'}
+                            </span>
+                        </div>
+                        <div style="font-size: 12px; color: #718096;">
+                            ${log.response_status_code || 'N/A'} • ${log.response_time_ms ? log.response_time_ms.toFixed(0) + 'ms' : 'N/A'}
+                        </div>
+                        <div style="font-size: 11px; color: #a0aec0; margin-top: 5px;">
+                            ${new Date(log.created_at).toLocaleString()}
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error loading recent tests:', error);
+            }
+        }
+
+        // Load logs
+        async function loadLogs() {
+            try {
+                const clientId = document.getElementById('filterClient').value;
+                const success = document.getElementById('filterSuccess').value;
+                const isTest = document.getElementById('filterTest').value;
+
+                let url = `${API_BASE}/webhooks/logs?limit=50`;
+                if (clientId) url += `&client_id=${clientId}`;
+                if (success) url += `&success=${success}`;
+                if (isTest) url += `&is_test=${isTest}`;
+
+                const response = await fetchWithAuth(url);
+                const logs = await response.json();
+
+                const container = document.getElementById('logsTable');
+
+                if (logs.length === 0) {
+                    container.innerHTML = '<div class="loading">No logs found</div>';
+                    return;
+                }
+
+                container.innerHTML = `
+                    <table class="logs-table">
+                        <thead>
+                            <tr>
+                                <th>Client</th>
+                                <th>URL</th>
+                                <th>Status</th>
+                                <th>Response Time</th>
+                                <th>Type</th>
+                                <th>Time</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${logs.map(log => `
+                                <tr>
+                                    <td>${log.client_name}</td>
+                                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${log.webhook_url}</td>
+                                    <td>
+                                        <span class="badge ${log.success ? 'badge-success' : 'badge-error'}">
+                                            ${log.response_status_code || 'Error'}
+                                        </span>
+                                    </td>
+                                    <td>${log.response_time_ms ? log.response_time_ms.toFixed(0) + 'ms' : 'N/A'}</td>
+                                    <td>
+                                        <span class="badge ${log.is_test ? 'badge-test' : 'badge-production'}">
+                                            ${log.is_test ? 'Test' : 'Production'}
+                                        </span>
+                                    </td>
+                                    <td>${new Date(log.created_at).toLocaleString()}</td>
+                                    <td>
+                                        <button class="btn-view" onclick="viewLog('${log.id}')">View</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+
+            } catch (error) {
+                console.error('Error loading logs:', error);
+            }
+        }
+
+        // View log details
+        async function viewLog(logId) {
+            try {
+                const response = await fetchWithAuth(`${API_BASE}/webhooks/logs/${logId}`);
+                const log = await response.json();
+
+                const modal = document.getElementById('logModal');
+                const details = document.getElementById('logDetails');
+
+                details.innerHTML = `
+                    <div class="detail-row">
+                        <label>Log ID</label>
+                        <div class="value">${log.id}</div>
+                    </div>
+                    <div class="detail-row">
+                        <label>Client</label>
+                        <div class="value">${log.client_name}</div>
+                    </div>
+                    <div class="detail-row">
+                        <label>Webhook URL</label>
+                        <div class="value">${log.webhook_url}</div>
+                    </div>
+                    <div class="detail-row">
+                        <label>HTTP Method</label>
+                        <div class="value">${log.method}</div>
+                    </div>
+                    <div class="detail-row">
+                        <label>Status</label>
+                        <div class="value">
+                            <span class="badge ${log.success ? 'badge-success' : 'badge-error'}">
+                                ${log.success ? 'Success' : 'Failed'}
+                            </span>
+                            ${log.response_status_code ? ` - HTTP ${log.response_status_code}` : ''}
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <label>Response Time</label>
+                        <div class="value">${log.response_time_ms ? log.response_time_ms.toFixed(2) + 'ms' : 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <label>Type</label>
+                        <div class="value">
+                            <span class="badge ${log.is_test ? 'badge-test' : 'badge-production'}">
+                                ${log.is_test ? 'Test' : 'Production'}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <label>Attempt Number</label>
+                        <div class="value">${log.attempt_number} ${log.is_retry ? '(Retry)' : ''}</div>
+                    </div>
+                    <div class="detail-row">
+                        <label>Timestamp</label>
+                        <div class="value">${new Date(log.created_at).toLocaleString()}</div>
+                    </div>
+                    ${log.error_message ? `
+                        <div class="detail-row">
+                            <label>Error Message</label>
+                            <div class="value" style="color: #e53e3e;">${log.error_message}</div>
+                        </div>
+                    ` : ''}
+                    <div class="detail-row">
+                        <label>Request Payload</label>
+                        <div class="value"><pre>${JSON.stringify(log.request_payload, null, 2)}</pre></div>
+                    </div>
+                    ${log.response_body ? `
+                        <div class="detail-row">
+                            <label>Response Body</label>
+                            <div class="value"><pre>${log.response_body}</pre></div>
+                        </div>
+                    ` : ''}
+                `;
+
+                modal.classList.add('active');
+
+            } catch (error) {
+                console.error('Error loading log details:', error);
+                alert('Error loading log details');
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('logModal').classList.remove('active');
+        }
+
+        // Initialize
+        async function init() {
+            // Get user email from token
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            document.getElementById('userEmail').textContent = payload.sub;
+
+            // Load data
+            await loadClients();
+            await loadStats();
+            await loadRecentTests();
+            await loadLogs();
+
+            // Auto-refresh every 30 seconds
+            setInterval(() => {
+                loadStats();
+                loadRecentTests();
+                loadLogs();
+            }, 30000);
+        }
+
+        // Start
+        init();
+    </script>
+</body>
+</html>
+
+
+

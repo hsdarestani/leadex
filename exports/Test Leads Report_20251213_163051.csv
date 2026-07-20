@@ -1,0 +1,36 @@
+id,mobile,name,email,status,created_at
+5de9552e-2e8d-449d-acdf-f0abd3ecf702,+971505678901,Mike Johnson,mike@example.com,ASSIGNED,2025-12-13 06:32:21
+8b2c793e-f632-4ece-ad89-e3b8d0e448ee,+971504567890,Sara Khan,sara@example.com,ASSIGNED,2025-12-13 06:32:21
+8741559a-a02f-4f97-91aa-44d56a385a1c,+971503456789,Ahmed Ali,ahmed@example.com,NEW,2025-12-13 06:32:21
+00aa06f4-9ff8-4747-81cd-4bfb80067917,+971502345678,Jane Smith,jane@example.com,NEW,2025-12-13 06:32:21
+ef97c6d1-3b2c-4165-82e8-7a7da153badc,+971501234567,John Doe,john@example.com,NEW,2025-12-13 06:32:21
+cbfe05dc-ac63-44bf-8d81-14e6019402a2,+971ccd1aff4f,Test Lead 10,test10@example.com,ASSIGNED,2025-12-12 13:48:34
+0658b3ad-0944-409d-9d63-11390c5b864e,+971215dddd61,Test Lead 9,test9@example.com,ASSIGNED,2025-12-12 13:48:34
+699e69c4-0077-441e-b24d-4692dc611ba8,+971afffe7848,Test Lead 8,test8@example.com,STORED,2025-12-12 13:48:34
+1303e31b-c2a4-4166-bc3b-025664d5cd78,+97108f97dcf2,Test Lead 7,test7@example.com,STORED,2025-12-12 13:48:34
+d7d36e0e-eb74-4a9b-b0cf-f114a0ab0eb8,+971e25d2f715,Test Lead 6,test6@example.com,STORED,2025-12-12 13:48:34
+7af3849d-8e1d-453a-84a5-a4244b7fb25e,+97135d7dc49c,Test Lead 5,test5@example.com,STORED,2025-12-12 13:48:34
+8519f77e-572f-4333-9b4b-6d8d1311c42e,+971637c47c0f,Test Lead 4,test4@example.com,STORED,2025-12-12 13:48:34
+2fce4897-27c7-4d66-8f48-4f3b75408a4c,+97181334c1b4,Test Lead 3,test3@example.com,STORED,2025-12-12 13:48:34
+b6bca0e5-4b8d-4360-a61b-d2d530dde8bb,+971469baa521,Test Lead 2,test2@example.com,STORED,2025-12-12 13:48:34
+aa51b89a-71d7-4823-8fa4-34873f4019eb,+971fbb01dd90,Test Lead 1,test1@example.com,STORED,2025-12-12 13:48:34
+cf63cf92-cc93-4396-adf8-6eab962cd9e6,+9717dfd975fe,Test Lead 10,test10@example.com,ASSIGNED,2025-12-12 13:45:08
+baa88984-857b-4a1b-967c-cbb8c6564e4e,+9717f89852bd,Test Lead 9,test9@example.com,ASSIGNED,2025-12-12 13:45:08
+236c1ada-6e63-447f-91b1-8df53f52cb23,+9715520b8eea,Test Lead 8,test8@example.com,ASSIGNED,2025-12-12 13:45:08
+d1767568-fcf2-4ca6-929a-ac5459d1cea7,+9715cf1d8768,Test Lead 7,test7@example.com,ASSIGNED,2025-12-12 13:45:08
+ad2bf295-7d68-4755-9105-a29d7fbc196f,+971bb0db3275,Test Lead 6,test6@example.com,ASSIGNED,2025-12-12 13:45:08
+3bdd2ed6-908b-4f6c-a25d-94ba814a925f,+9716c551eb04,Test Lead 5,test5@example.com,ASSIGNED,2025-12-12 13:45:08
+54ed5442-f414-40e2-a473-9a5d06523a2d,+97140f1bc3c6,Test Lead 4,test4@example.com,ASSIGNED,2025-12-12 13:45:08
+33d447db-543f-4339-a508-21e6a05fa7e7,+9718068afa97,Test Lead 3,test3@example.com,ASSIGNED,2025-12-12 13:45:08
+543d1ff7-35f2-4cad-9965-56c0594c0196,+971684017eab,Test Lead 2,test2@example.com,ASSIGNED,2025-12-12 13:45:08
+0fd62a5a-17bb-4292-bbab-0477026a4a53,+971f9a5dc8db,Test Lead 1,test1@example.com,ASSIGNED,2025-12-12 13:45:08
+47b7b230-b2ac-41c4-91e0-830a84a62f29,+9716c88870c0,Test Lead 10,test10@example.com,NEW,2025-12-12 13:44:25
+b34605a9-1632-4393-a1ba-3b6c17442dd6,+9710e9112252,Test Lead 9,test9@example.com,NEW,2025-12-12 13:44:25
+beef1c52-5d98-4885-84fd-d3405cf18989,+971f5839f325,Test Lead 8,test8@example.com,NEW,2025-12-12 13:44:25
+c2b3977f-f557-41d7-91d4-96b17885b897,+9713a0d2bd64,Test Lead 7,test7@example.com,NEW,2025-12-12 13:44:25
+78b908d1-aee7-44c2-8b86-49df50bbcca5,+9710b3315939,Test Lead 6,test6@example.com,NEW,2025-12-12 13:44:25
+5d3871e4-3840-40c7-bf46-2d62a42ea060,+97111b8ef892,Test Lead 5,test5@example.com,NEW,2025-12-12 13:44:25
+041fc052-58b9-4268-9aed-0d52fe6a85f7,+9717787f9009,Test Lead 4,test4@example.com,NEW,2025-12-12 13:44:25
+988177a3-9ac1-4a4c-9611-ff6a75e26c55,+971be9d12cb2,Test Lead 3,test3@example.com,NEW,2025-12-12 13:44:25
+815de9e5-864e-43df-9ade-44dcdb7a6077,+971af75dc560,Test Lead 2,test2@example.com,NEW,2025-12-12 13:44:25
+2a53cd08-fe99-4a90-bebe-5d5aace33725,+971abea6c6ae,Test Lead 1,test1@example.com,NEW,2025-12-12 13:44:25

@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خرید اقساطی خانه در دبی | سرمایه‌گذاری دلاری و پرداخت ریالی</title>
+    <meta name="description" content="خرید ملک رویایی در دبی با شرایط اقساطی ویژه. امکان پرداخت مستقیم به ریال ایران، دریافت اقامت طلایی و کسب درآمد دلاری. مالکیت ۱۰۰٪. مشاوره رایگان.">
+    <style>
+        :root {
+            --gold: #cfb163;
+            --dark-blue: #0a1e3c;
+            --light-bg: #f8f9fa;
+            --text-color: #333;
+            --white: #ffffff;
+        }
+        body {
+            font-family: Tahoma, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        h1, h2, h3 {
+            color: var(--dark-blue);
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px 0;
+        }
+        .btn {
+            display: inline-block;
+            background-color: var(--gold);
+            color: var(--white);
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+        .btn:hover {
+            background-color: #b3964a;
+        }
+        
+        /* Hero Section */
+        .hero {
+            /* Placeholder for Hero Image - Replace URL with actual image */
+            background: linear-gradient(rgba(10, 30, 60, 0.7), rgba(10, 30, 60, 0.7)), url('https://via.placeholder.com/1920x800/0a1e3c/cfb163?text=Dubai+Dream+Home+Sunset+View');
+            background-size: cover;
+            background-position: center;
+            color: var(--white);
+            text-align: center;
+            padding: 150px 20px;
+        }
+        .hero h1 {
+            color: var(--white);
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        .hero h2 {
+            color: #eee;
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            font-weight: normal;
+        }
+
+        /* Benefits Section */
+        .benefits {
+            padding: 60px 0;
+            background-color: var(--white);
+            text-align: center;
+        }
+        .benefits-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+        .benefit-card {
+            flex: 1 1 300px;
+            padding: 30px;
+            background: var(--light-bg);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .benefit-icon {
+            font-size: 3rem;
+            color: var(--gold);
+            margin-bottom: 20px;
+        }
+
+        /* Payment Section */
+        .payment-rial {
+            padding: 80px 0;
+            background-color: var(--light-bg);
+        }
+        .payment-flex {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 40px;
+        }
+        .payment-text {
+            flex: 1 1 500px;
+        }
+        .payment-image {
+            flex: 1 1 400px;
+        }
+        .payment-image img {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .payment-text ul {
+            list-style: none;
+            padding: 0;
+        }
+        .payment-text ul li::before {
+            content: "✓";
+            color: var(--gold);
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        /* How it Works */
+        .how-it-works {
+            padding: 80px 0;
+            text-align: center;
+        }
+        .steps-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            margin-top: 40px;
+            gap: 20px;
+        }
+        .step-card {
+            flex: 1 1 250px;
+            position: relative;
+        }
+        .step-number {
+            background-color: var(--gold);
+            color: var(--white);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0 auto 20px;
+        }
+
+        /* Contact Form */
+        .contact-section {
+            padding: 80px 0;
+            background-color: var(--dark-blue);
+            color: var(--white);
+        }
+        .form-container {
+            max-width: 600px;
+            margin: auto;
+            background: var(--white);
+            padding: 40px;
+            border-radius: 10px;
+            color: var(--text-color);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box; /* Important for padding */
+            font-family: inherit;
+        }
+        .submit-btn {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            padding: 80px 0;
+            background-color: var(--light-bg);
+        }
+        .faq-container {
+            max-width: 800px;
+            margin: auto;
+        }
+        details {
+            background: var(--white);
+            margin-bottom: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        summary {
+            padding: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            position: relative;
+            list-style: none; /* Remove default arrow */
+        }
+        summary::-webkit-details-marker {
+            display: none;
+        }
+        summary::after {
+            content: '+';
+            position: absolute;
+            left: 20px;
+            color: var(--gold);
+            font-size: 1.5rem;
+        }
+        details[open] summary::after {
+            content: '-';
+        }
+        .faq-content {
+            padding: 0 20px 20px;
+            border-top: 1px solid #eee;
+        }
+
+        footer {
+            background: var(--dark-blue);
+            color: #aaa;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.8rem; }
+            .hero { padding: 100px 20px; }
+            .payment-flex { flex-direction: column-reverse; }
+            .payment-image, .payment-text { flex: 1 1 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="hero">
+        <div class="container">
+            <h1>صاحب خانه‌ی رویایی خود در دبی شوید (با شرایط اقساطی ویژه)</h1>
+            <h2>سرمایه‌گذاری امن دلاری، پرداخت آسان ریالی. مسیر دریافت اقامت طلایی امارات و مالکیت صد در صد، هم‌اکنون در دسترس شماست.</h2>
+            <a href="#contact-form" class="btn">مشاوره رایگان و دریافت لیست پروژه‌ها</a>
+        </div>
+    </header>
+
+    <section class="benefits">
+        <div class="container">
+            <h2>چرا سرمایه‌گذاری در املاک دبی؟</h2>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">💰</div>
+                    <h3>درآمد خالص دلاری</h3>
+                    <p>با اجاره ملک خود، ماهانه درآمد ارزی پایدار داشته باشید و ارزش سرمایه‌تان را در برابر تورم حفظ کنید.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">🏠</div>
+                    <h3>مالکیت ۱۰۰٪ و قطعی</h3>
+                    <p>در مناطق آزاد (Freehold)، سند مالکیت قطعی (عرصه و اعیان) مستقیماً به نام شما صادر می‌شود.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">✨</div>
+                    <h3>اقامت طلایی و رفاه</h3>
+                    <p>واجد شرایط دریافت ویزای اقامت ۱۰ ساله برای خود و تمام اعضای خانواده شوید و از سبک زندگی جهانی لذت ببرید.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="payment-rial">
+        <div class="container">
+            <div class="payment-flex">
+                <div class="payment-text">
+                    <h2>دغدغه انتقال ارز را فراموش کنید؛ پرداخت مستقیم به ریال</h2>
+                    <p>ما مسیر سرمایه‌گذاری شما را هموار کرده‌ایم. شما می‌توانید پیش‌پرداخت و اقساط ملک خود را مستقیماً به <strong>ریال ایران</strong> از طریق مسیرهای مالی امن و قانونی داخلی پرداخت کنید.</p>
+                    <ul>
+                        <li>بدون نیاز به حساب بانکی خارجی در ابتدای مسیر.</li>
+                        <li>محاسبه شفاف بر اساس نرخ روز.</li>
+                        <li>اقساط بلند مدت و بدون بهره.</li>
+                    </ul>
+                    <br>
+                    <a href="#contact-form" class="btn">درخواست مشاوره پرداخت ریالی</a>
+                </div>
+                <div class="payment-image">
+                     <img src="https://via.placeholder.com/600x400/cfb163/0a1e3c?text=Rial+Payment+Solution" alt="پرداخت ریالی برای خرید ملک دبی">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="how-it-works">
+        <div class="container">
+            <h2>مسیر ساده‌ی صاحب‌خانه شدن</h2>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">۱</div>
+                    <h3>مشاوره اختصاصی</h3>
+                    <p>بررسی بودجه و اهداف سرمایه‌گذاری شما توسط کارشناسان.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">۲</div>
+                    <h3>انتخاب واحد رویایی</h3>
+                    <p>معرفی بهترین پروژه‌های اقساطی متناسب با شرایط شما.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">۳</div>
+                    <h3>خرید و مالکیت</h3>
+                    <p>شروع پرداخت اقساط (ریالی/ارزی) و دریافت سند مالکیت ۱۰۰٪.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact-section" id="contact-form">
+        <div class="container">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2>همین امروز برای آینده‌ی خود قدم بردارید</h2>
+                <p>برای اطلاع از جدیدترین پروژه‌های اقساطی با امکان پرداخت ریالی، فرم زیر را تکمیل کنید.</p>
+            </div>
+            <div class="form-container">
+<form id="leadForm">
+    <div class="form-group">
+        <label for="name">
+            نام و نام خانوادگی <span class="required">*</span>
+        </label>
+        <input
+            type="text"
+            id="name"
+            name="name"
+            required
+            placeholder="مثال: علی محمدی"
+            autocomplete="name"
+        >
+    </div>
+
+    <div class="form-group">
+        <label for="phone">
+            شماره تماس (دارای واتس‌اپ) <span class="required">*</span>
+        </label>
+        <input
+            type="tel"
+            id="phone"
+            name="phone"
+            required
+            placeholder="0912..."
+            autocomplete="tel"
+        >
+    </div>
+
+    <div class="form-group">
+        <label for="email">
+            ایمیل <span class="required">*</span>
+        </label>
+        <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            placeholder="example@mail.com"
+            autocomplete="email"
+        >
+    </div>
+
+    <button type="submit" class="submit-btn" id="submitBtn">
+        درخواست تماس مشاوره رایگان
+    </button>
+</form>
+
+            </div>
+        </div>
+    </section>
+
+    <section class="faq-section">
+        <div class="container faq-container">
+            <h2 style="text-align: center; margin-bottom: 40px;">سوالات متداول</h2>
+            
+            <details open>
+                <summary>آیا مالکیت ملک در دبی برای ایرانیان ۱۰۰٪ است؟</summary>
+                <div class="faq-content">
+                    <p>بله، قطعاً. در مناطق تعیین شده به عنوان "Freehold"، سند مالکیت قطعی و دائمی (عرصه و اعیان) مستقیماً به نام شخص خریدار (با هر ملیتی از جمله ایرانی) صادر می‌شود و نیازی به هیچگونه شریک یا کفیل محلی نیست.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>چگونه می‌توانم اقساط را به ریال پرداخت کنم؟</summary>
+                <div class="faq-content">
+                    <p>ما این فرآیند را ساده کرده‌ایم. شما مبلغ معادل ریالی قسط خود را به نرخ روز از طریق درگاه‌های امن یا صرافی‌های معتبر داخلی پرداخت می‌کنید و ما رسید رسمی تسویه آن قسط در دبی را به شما تحویل می‌دهیم.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>آیا با خرید اقساطی هم می‌توان اقامت گرفت؟</summary>
+                <div class="faq-content">
+                    <p>بله. طبق قوانین جدید، به محض اینکه مجموع پرداختی‌های شما بابت ملک به حد نصاب قانونی تعیین شده توسط دولت امارات برسد (حتی اگر هنوز اقساط ملک به پایان نرسیده باشد)، واجد شرایط درخواست ویزای اقامت خواهید شد.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>میزان درآمد اجاره (دلاری) چقدر است؟</summary>
+                <div class="faq-content">
+                    <p>دبی یکی از جذاب‌ترین بازارهای جهان برای سرمایه‌گذاران ملکی است. بازگشت سرمایه از طریق اجاره (ROI) بسته به منطقه و نوع ملک، معمولاً بین ۶٪ تا ۹٪ خالص سالانه به دلار است.</p>
+                </div>
+            </details>
+
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>تمامی حقوق محفوظ است © ۲۰۲۴ | سرمایه‌گذاری مطمئن املاک در دبی</p>
+        </div>
+    </footer>
+
+<script>
+    const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:8000' : '';
+
+    const form = document.getElementById('leadForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const messageDiv = document.getElementById('message');
+
+    function showMessage(text, type) {
+        messageDiv.textContent = text;
+        messageDiv.className = `message ${type}`;
+        messageDiv.style.display = 'block';
+
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 5000);
+    }
+
+    function validatePhone(phone) {
+        const cleaned = phone.replace(/[\s\-\(\)]/g, '');
+        return /^\+?\d{8,15}$/.test(cleaned);
+    }
+
+    function validateEmail(email) {
+        return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
+    }
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById('name').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const email = document.getElementById('email').value.trim();
+
+        // Validation
+        if (!name || name.length < 2) {
+            showMessage('لطفاً نام معتبر وارد کنید (حداقل ۲ کاراکتر)', 'error');
+            return;
+        }
+
+        if (!validatePhone(phone)) {
+            showMessage('لطفاً شماره تماس معتبر وارد کنید (۸ تا ۱۵ رقم)', 'error');
+            return;
+        }
+
+        if (!validateEmail(email)) {
+            showMessage('لطفاً ایمیل معتبر وارد کنید', 'error');
+            return;
+        }
+
+        // Disable button
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'در حال ارسال...';
+
+        try {
+            const response = await fetch(`${API_BASE}/api/public/submit-lead`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: name,
+                    mobile: phone,
+                    email: email
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                showMessage(data.message || 'اطلاعات شما با موفقیت ثبت شد.', 'success');
+                form.reset();
+
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 3000);
+            } else {
+                showMessage(data.detail || data.message || 'ارسال اطلاعات با خطا مواجه شد. لطفاً مجدداً تلاش کنید.', 'error');
+            }
+        } catch (error) {
+            console.error('Submission error:', error);
+            showMessage('خطای شبکه. لطفاً اتصال اینترنت را بررسی کرده و دوباره تلاش کنید.', 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'درخواست تماس مشاوره رایگان';
+        }
+    });
+
+    document.getElementById('phone').addEventListener('blur', function() {
+        if (this.value && !validatePhone(this.value)) {
+            this.style.borderColor = '#f56565';
+        } else {
+            this.style.borderColor = '#e2e8f0';
+        }
+    });
+
+    document.getElementById('email').addEventListener('blur', function() {
+        if (this.value && !validateEmail(this.value)) {
+            this.style.borderColor = '#f56565';
+        } else {
+            this.style.borderColor = '#e2e8f0';
+        }
+    });
+</script>
+
+</body>
+</html>

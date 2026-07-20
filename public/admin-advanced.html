@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="/admin-nav.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Features - Leadex Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 15px;
+        }
+
+        .header-nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .header-nav a:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        .tabs {
+            background: white;
+            padding: 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .tab-buttons {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: white;
+        }
+
+        .tab-button:hover {
+            background: #e9ecef;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        table thead {
+            background: #f8f9fa;
+        }
+
+        table th,
+        table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        table th {
+            font-weight: 600;
+            color: #333;
+        }
+
+        table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin: 2px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+
+        .score-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .grade-A { background: #28a745; color: white; }
+        .grade-B { background: #17a2b8; color: white; }
+        .grade-C { background: #ffc107; color: #333; }
+        .grade-D { background: #fd7e14; color: white; }
+        .grade-F { background: #dc3545; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>🚀 Advanced Features</h1>
+            </div>
+            <div class="header-nav">
+                <a href="/admin-dashboard.html">Dashboard</a>
+                <a href="/admin-leads.html">📊 Leads</a>
+                <a href="/admin-analytics.html">📊 Analytics</a>
+                <a href="/admin-webhooks.html">🔗 Webhooks</a>
+                <a href="/admin-imports.html">📥 Imports</a>
+                <a href="/admin-notifications.html">📧 Notifications</a>
+                <a href="/admin-advanced.html">🚀 Advanced</a>
+            </div>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+
+        <div class="tabs">
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="switchTab('tags')">🏷️ Tags</button>
+                <button class="tab-button" onclick="switchTab('custom-fields')">📝 Custom Fields</button>
+                <button class="tab-button" onclick="switchTab('scoring')">⭐ Lead Scoring</button>
+                <button class="tab-button" onclick="switchTab('notes')">📋 Notes</button>
+            </div>
+
+            <!-- Tags Tab -->
+            <div id="tags-tab" class="tab-content active">
+                <h2>Lead Tags Management</h2>
+
+                <div class="form-group">
+                    <h3>Create New Tag</h3>
+                    <form id="createTagForm" onsubmit="createTag(event)">
+                        <div class="form-group">
+                            <label>Tag Name *</label>
+                            <input type="text" id="tagName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Color (Hex)</label>
+                            <input type="color" id="tagColor" value="#667eea">
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea id="tagDescription"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create Tag</button>
+                    </form>
+                </div>
+
+                <div id="tagsAlert"></div>
+
+                <h3>Existing Tags</h3>
+                <div id="tagsList"></div>
+            </div>
+
+            <!-- Custom Fields Tab -->
+            <div id="custom-fields-tab" class="tab-content">
+                <h2>Custom Fields Management</h2>
+
+                <div class="form-group">
+                    <h3>Create New Custom Field</h3>
+                    <form id="createFieldForm" onsubmit="createCustomField(event)">
+                        <div class="form-group">
+                            <label>Field Name (Internal) *</label>
+                            <input type="text" id="fieldName" required placeholder="e.g., company_size">
+                        </div>
+                        <div class="form-group">
+                            <label>Field Label (Display) *</label>
+                            <input type="text" id="fieldLabel" required placeholder="e.g., Company Size">
+                        </div>
+                        <div class="form-group">
+                            <label>Field Type *</label>
+                            <select id="fieldType" required>
+                                <option value="text">Text</option>
+                                <option value="number">Number</option>
+                                <option value="date">Date</option>
+                                <option value="boolean">Boolean</option>
+                                <option value="select">Select (Dropdown)</option>
+                                <option value="multiselect">Multi-Select</option>
+                                <option value="url">URL</option>
+                                <option value="email">Email</option>
+                                <option value="phone">Phone</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea id="fieldDescription"></textarea>
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="fieldRequired">
+                            <label>Required Field</label>
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="fieldShowInList">
+                            <label>Show in Lead List</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create Custom Field</button>
+                    </form>
+                </div>
+
+                <div id="fieldsAlert"></div>
+
+                <h3>Existing Custom Fields</h3>
+                <div id="customFieldsList"></div>
+            </div>
+
+            <!-- Scoring Tab -->
+            <div id="scoring-tab" class="tab-content">
+                <h2>Lead Scoring</h2>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Scored Leads</h3>
+                        <div class="value" id="totalScored">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Average Score</h3>
+                        <div class="value" id="avgScore">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Grade A Leads</h3>
+                        <div class="value" id="gradeA">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Grade B Leads</h3>
+                        <div class="value" id="gradeB">0</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <h3>Calculate Lead Score</h3>
+                    <form id="calculateScoreForm" onsubmit="calculateScore(event)">
+                        <div class="form-group">
+                            <label>Lead ID *</label>
+                            <input type="text" id="scoreLeadId" required placeholder="Enter lead UUID">
+                        </div>
+                        <button type="submit" class="btn btn-success">Calculate Score</button>
+                    </form>
+                </div>
+
+                <div id="scoringAlert"></div>
+                <div id="scoreResult"></div>
+
+                <h3>Scoring Algorithm (v1.0)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Factor</th>
+                            <th>Points</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Has Email</td>
+                            <td>+20</td>
+                            <td>Lead has a valid email address</td>
+                        </tr>
+                        <tr>
+                            <td>Has Name</td>
+                            <td>+15</td>
+                            <td>Lead has a name provided</td>
+                        </tr>
+                        <tr>
+                            <td>Premium Source</td>
+                            <td>+30</td>
+                            <td>Lead from Google, Facebook, or LinkedIn</td>
+                        </tr>
+                        <tr>
+                            <td>Standard Source</td>
+                            <td>+10</td>
+                            <td>Lead from other sources</td>
+                        </tr>
+                        <tr>
+                            <td>Custom Fields</td>
+                            <td>+5 each (max 25)</td>
+                            <td>Lead has custom field values</td>
+                        </tr>
+                        <tr>
+                            <td>Has Notes</td>
+                            <td>+10</td>
+                            <td>Lead has at least one note</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 style="margin-top: 30px;">Grade Scale</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Grade</th>
+                            <th>Score Range</th>
+                            <th>Quality</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="tag grade-A">A</span></td>
+                            <td>80-100</td>
+                            <td>Excellent</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag grade-B">B</span></td>
+                            <td>60-79</td>
+                            <td>Good</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag grade-C">C</span></td>
+                            <td>40-59</td>
+                            <td>Average</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag grade-D">D</span></td>
+                            <td>20-39</td>
+                            <td>Below Average</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag grade-F">F</span></td>
+                            <td>0-19</td>
+                            <td>Poor</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Notes Tab -->
+            <div id="notes-tab" class="tab-content">
+                <h2>Lead Notes</h2>
+
+                <div class="form-group">
+                    <h3>Add Note to Lead</h3>
+                    <form id="createNoteForm" onsubmit="createNote(event)">
+                        <div class="form-group">
+                            <label>Lead ID *</label>
+                            <input type="text" id="noteLeadId" required placeholder="Enter lead UUID">
+                        </div>
+                        <div class="form-group">
+                            <label>Note *</label>
+                            <textarea id="noteContent" required></textarea>
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="noteInternal">
+                            <label>Internal Note (Admin Only)</label>
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="notePinned">
+                            <label>Pin Note</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Note</button>
+                    </form>
+                </div>
+
+                <div id="notesAlert"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:8000/api/admin';
+
+        function getToken() {
+            return localStorage.getItem('admin_token');
+        }
+
+        async function fetchWithAuth(url, options = {}) {
+            const token = getToken();
+            if (!token) {
+                window.location.href = '/admin-login.html';
+                return;
+            }
+
+            const headers = {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+
+            const response = await fetch(url, { ...options, headers });
+
+            if (response.status === 401) {
+                localStorage.removeItem('admin_token');
+                window.location.href = '/admin-login.html';
+                return;
+            }
+
+            return response;
+        }
+
+        function logout() {
+            localStorage.removeItem('admin_token');
+            window.location.href = '/admin-login.html';
+        }
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            event.target.classList.add('active');
+
+            // Load data for the tab
+            if (tabName === 'tags') {
+                loadTags();
+            } else if (tabName === 'custom-fields') {
+                loadCustomFields();
+            } else if (tabName === 'scoring') {
+                loadScoringStats();
+            }
+        }
+
+        // ============================================================================
+        // TAGS FUNCTIONS
+        // ============================================================================
+
+        async function createTag(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('tagName').value;
+            const color = document.getElementById('tagColor').value;
+            const description = document.getElementById('tagDescription').value;
+
+            try {
+                const response = await fetchWithAuth(`${API_BASE}/advanced/tags`, {
+                    method: 'POST',
+                    body: JSON.stringify({ name, color, description })
+                });
+
+                if (response.ok) {
+                    showAlert('tagsAlert', 'Tag created successfully!', 'success');
+                    document.getElementById('createTagForm').reset();
+                    loadTags();
+                } else {
+                    const error = await response.json();
+                    showAlert('tagsAlert', error.detail || 'Failed to create tag', 'error');
+                }
+            } catch (error) {
+                showAlert('tagsAlert', 'Error creating tag', 'error');
+            }
+        }
+
+        async function loadTags() {
+            try {
+                const response = await fetchWithAuth(`${API_BASE}/advanced/tags`);
+                const tags = await response.json();
+
+                const tagsList = document.getElementById('tagsList');
+                if (tags.length === 0) {
+                    tagsList.innerHTML = '<p>No tags created yet.</p>';
+                    return;
+                }
+
+                let html = '<table><thead><tr><th>Name</th><th>Color</th><th>Description</th><th>Created</th></tr></thead><tbody>';
+                tags.forEach(tag => {
+                    html += `
+                        <tr>
+                            <td><span class="tag" style="background: ${tag.color || '#667eea'}; color: white;">${tag.name}</span></td>
+                            <td>${tag.color || 'N/A'}</td>
+                            <td>${tag.description || 'N/A'}</td>
+                            <td>${new Date(tag.created_at).toLocaleString()}</td>
+                        </tr>
+                    `;
+                });
+                html += '</tbody></table>';
+                tagsList.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading tags:', error);
+            }
+        }
+
+        // ============================================================================
+        // CUSTOM FIELDS FUNCTIONS
+        // ============================================================================
+
+        async function createCustomField(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('fieldName').value;
+            const label = document.getElementById('fieldLabel').value;
+            const field_type = document.getElementById('fieldType').value;
+            const description = document.getElementById('fieldDescription').value;
+            const is_required = document.getElementById('fieldRequired').checked;
+            const show_in_list = document.getElementById('fieldShowInList').checked;
+
+            try {
+                const response = await fetchWithAuth(`${API_BASE}/advanced/custom-fields`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        name,
+                        label,
+                        field_type,
+                        description,
+                        is_required,
+                        show_in_list,
+                        is_active: true,
+                        display_order: 0
+                    })
+                });
+
+                if (response.ok) {
+                    showAlert('fieldsAlert', 'Custom field created successfully!', 'success');
+                    document.getElementById('createFieldForm').reset();
+                    loadCustomFields();
+                } else {
+                    const error = await response.json();
+                    showAlert('fieldsAlert', error.detail || 'Failed to create custom field', 'error');
+                }
+            } catch (error) {
+                showAlert('fieldsAlert', 'Error creating custom field', 'error');
+            }
+        }
+
+        async function loadCustomFields() {
+            try {
+                const response = await fetchWithAuth(`${API_BASE}/advanced/custom-fields?active_only=false`);
+                const fields = await response.json();
+
+                const fieldsList = document.getElementById('customFieldsList');
+                if (fields.length === 0) {
+                    fieldsList.innerHTML = '<p>No custom fields created yet.</p>';
+                    return;
+                }
+
+                let html = '<table><thead><tr><th>Name</th><th>Label</th><th>Type</th><th>Required</th><th>Active</th><th>Show in List</th></tr></thead><tbody>';
+                fields.forEach(field => {
+                    html += `
+                        <tr>
+                            <td><code>${field.name}</code></td>
+                            <td>${field.label}</td>
+                            <td>${field.field_type}</td>
+                            <td>${field.is_required ? '✅' : '❌'}</td>
+                            <td>${field.is_active ? '✅' : '❌'}</td>
+                            <td>${field.show_in_list ? '✅' : '❌'}</td>
+                        </tr>
+                    `;
+                });
+                html += '</tbody></table>';
+                fieldsList.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading custom fields:', error);
+            }
+        }
+
+        // ============================================================================
+        // SCORING FUNCTIONS
+        // ============================================================================
+
+        async function loadScoringStats() {
+            try {
+                const response = await fetchWithAuth(`${API_BASE}/advanced/scoring/stats/overview`);
+                const stats = await response.json();
+
+                document.getElementById('totalScored').textContent = stats.total_scored_leads;
+                document.getElementById('avgScore').textContent = stats.average_score;
+                document.getElementById('gradeA').textContent = stats.grade_distribution.A || 0;
+                document.getElementById('gradeB').textContent = stats.grade_distribution.B || 0;
+            } catch (error) {
+                console.error('Error loading scoring stats:', error);
+            }
+        }
+
+        async function calculateScore(event) {
+            event.preventDefault();
+
+            const leadId = document.getElementById('scoreLeadId').value;
+
+            try {
+                const response = await fetchWithAuth(`${API_BASE}/advanced/scoring/calculate/${leadId}`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    const score = await response.json();
+                    showAlert('scoringAlert', 'Score calculated successfully!', 'success');
+
+                    let html = `
+                        <div style="background: white; padding: 20px; border-radius: 10px; margin-top: 20px;">
+                            <h3>Lead Score Result</h3>
+                            <p><strong>Lead ID:</strong> ${score.asset_id}</p>
+                            <p><strong>Score:</strong> <span class="score-badge grade-${score.grade}">${score.score} / 100</span></p>
+                            <p><strong>Grade:</strong> <span class="tag grade-${score.grade}">${score.grade}</span></p>
+                            <p><strong>Last Calculated:</strong> ${new Date(score.last_calculated_at).toLocaleString()}</p>
+
+                            <h4>Score Breakdown:</h4>
+                            <ul>
+                    `;
+
+                    if (score.score_breakdown) {
+                        for (const [key, value] of Object.entries(score.score_breakdown)) {
+                            html += `<li><strong>${key}:</strong> +${value} points</li>`;
+                        }
+                    }
+
+                    html += `
+                            </ul>
+                        </div>
+                    `;
+
+                    document.getElementById('scoreResult').innerHTML = html;
+                    loadScoringStats();
+                } else {
+                    const error = await response.json();
+                    showAlert('scoringAlert', error.detail || 'Failed to calculate score', 'error');
+                }
+            } catch (error) {
+                showAlert('scoringAlert', 'Error calculating score', 'error');
+            }
+        }
+
+        // ============================================================================
+        // NOTES FUNCTIONS
+        // ============================================================================
+
+        async function createNote(event) {
+            event.preventDefault();
+
+            const asset_id = document.getElementById('noteLeadId').value;
+            const note = document.getElementById('noteContent').value;
+            const is_internal = document.getElementById('noteInternal').checked;
+            const is_pinned = document.getElementById('notePinned').checked;
+
+            try {
+                const response = await fetchWithAuth(`${API_BASE}/advanced/notes`, {
+                    method: 'POST',
+                    body: JSON.stringify({ asset_id, note, is_internal, is_pinned })
+                });
+
+                if (response.ok) {
+                    showAlert('notesAlert', 'Note added successfully!', 'success');
+                    document.getElementById('createNoteForm').reset();
+                } else {
+                    const error = await response.json();
+                    showAlert('notesAlert', error.detail || 'Failed to add note', 'error');
+                }
+            } catch (error) {
+                showAlert('notesAlert', 'Error adding note', 'error');
+            }
+        }
+
+        // ============================================================================
+        // UTILITY FUNCTIONS
+        // ============================================================================
+
+        function showAlert(elementId, message, type) {
+            const alertDiv = document.getElementById(elementId);
+            alertDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => {
+                alertDiv.innerHTML = '';
+            }, 5000);
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!getToken()) {
+                window.location.href = '/admin-login.html';
+                return;
+            }
+
+            loadTags();
+        });
+    </script>
+</body>
+</html>
+

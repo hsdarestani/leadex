@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Leadex Client Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --sidebar: #0f172a;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); }
+
+        /* Navigation Header */
+        .header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 40px;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-area { display: flex; align-items: center; gap: 12px; }
+        .logo-area h1 { font-size: 20px; font-weight: 800; color: var(--sidebar); letter-spacing: -0.5px; }
+        .logo-area span { color: var(--primary); }
+
+        .client-profile { display: flex; align-items: center; gap: 20px; }
+        .client-info { text-align: right; }
+        .client-name { font-size: 14px; font-weight: 600; color: var(--text-main); }
+        .client-id { font-size: 12px; color: var(--text-muted); }
+
+        .logout-btn {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .logout-btn:hover { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+
+        /* Main Layout */
+        .container { max-width: 1400px; margin: 32px auto; padding: 0 40px; }
+
+        .page-header { margin-bottom: 32px; }
+        .page-header h2 { font-size: 24px; font-weight: 700; color: #0f172a; }
+        .page-header p { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            transition: transform 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+        .stat-card h3 { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+        .stat-card .value { font-size: 28px; font-weight: 700; color: var(--sidebar); }
+        .stat-card .subvalue { font-size: 12px; color: var(--success); font-weight: 500; margin-top: 8px; display: flex; align-items: center; gap: 4px; }
+
+        /* Content Section */
+        .section {
+            background: var(--surface);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .section-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fcfdfe;
+        }
+
+        .section h2 { font-size: 18px; font-weight: 600; }
+
+        .actions { display: flex; gap: 12px; }
+
+        .export-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+        .export-btn:hover { opacity: 0.9; }
+
+        .filter-group select {
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: inherit;
+            color: var(--text-main);
+            outline: none;
+            background: #fff;
+        }
+
+        /* Table Styles */
+        .table-container { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            background: #f8fafc;
+            padding: 16px 32px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border);
+        }
+        td { padding: 18px 32px; font-size: 14px; border-bottom: 1px solid var(--border); color: #475569; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #fcfdfe; }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+        }
+        .status-success { background: #ecfdf5; color: #065f46; }
+        .status-failed { background: #fef2f2; color: #991b1b; }
+
+        .loading-pulse { color: var(--text-muted); padding: 60px; text-align: center; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo-area">
+                <h1>LEADEX<span>.</span></h1>
+            </div>
+            <div class="client-profile">
+                <div class="client-info">
+                    <div class="client-name" id="clientName">Portal User</div>
+                    <div class="client-id" id="displayId">Verified Account</div>
+                </div>
+                <button class="logout-btn" onclick="logout()">Sign Out</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="page-header">
+            <h2>Operations Overview</h2>
+            <p>Real-time delivery statistics and lead acquisition data.</p>
+        </div>
+
+        <div class="stats-grid" id="statsGrid">
+            <div class="loading-pulse">Synchronizing performance metrics...</div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header">
+                <h2>Transaction History</h2>
+                <div class="actions">
+                    <div class="filter-group">
+                        <select id="statusFilter" onchange="loadLeads()">
+                            <option value="">Filter by Status</option>
+                            <option value="success">Success</option>
+                            <option value="failed">Failed</option>
+                        </select>
+                    </div>
+                    <button class="export-btn" onclick="exportLeads()">Download CSV</button>
+                </div>
+            </div>
+            
+            <div class="table-container" id="leadsTable">
+                <div class="loading-pulse">Retrieving lead database...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('client_token');
+        const clientName = localStorage.getItem('client_name');
+
+        if (!token) window.location.href = '/client-login.html';
+
+        document.getElementById('clientName').textContent = clientName || 'Verified Client';
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/client-login.html';
+        }
+
+        async function fetchWithAuth(url) {
+            const response = await fetch(url, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.status === 401) { logout(); return null; }
+            return response;
+        }
+
+        async function loadStats() {
+            try {
+                const response = await fetchWithAuth('/api/client/portal/stats');
+                if (!response) return;
+                const stats = await response.json();
+
+                const statsGrid = document.getElementById('statsGrid');
+                statsGrid.innerHTML = `
+                    <div class="stat-card">
+                        <h3>All-Time Volume</h3>
+                        <div class="value">${stats.total_leads.toLocaleString()}</div>
+                        <div class="subvalue">Total processed</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Daily Velocity</h3>
+                        <div class="value">${stats.today_leads}</div>
+                        <div class="subvalue">Last 24h</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Success Rate</h3>
+                        <div class="value">${stats.delivery_success_rate}%</div>
+                        <div class="subvalue">${stats.successful_deliveries} Delivered</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Credit Reserve</h3>
+                        <div class="value">$${stats.credits_balance.toFixed(2)}</div>
+                        <div class="subvalue">Active balance</div>
+                    </div>
+                `;
+            } catch (error) { console.error('Stats Sync Error:', error); }
+        }
+
+        async function loadLeads() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const url = `/api/client/portal/leads?limit=100${statusFilter ? '&status_filter=' + statusFilter : ''}`;
+
+            try {
+                const response = await fetchWithAuth(url);
+                if (!response) return;
+                const leads = await response.json();
+                const container = document.getElementById('leadsTable');
+
+                if (leads.length === 0) {
+                    container.innerHTML = '<div class="loading-pulse">No historical data available.</div>';
+                    return;
+                }
+
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Contact Information</th>
+                                <th>Name / Email</th>
+                                <th>Processed At</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${leads.map(lead => `
+                                <tr>
+                                    <td style="font-weight:600; color:var(--sidebar)">${lead.mobile}</td>
+                                    <td>
+                                        <div style="font-weight:500">${lead.name || 'Unspecified'}</div>
+                                        <div style="font-size:12px; color:var(--text-muted)">${lead.email || 'N/A'}</div>
+                                    </td>
+                                    <td>${new Date(lead.delivered_at).toLocaleString()}</td>
+                                    <td>
+                                        <span class="status-badge status-${lead.delivery_status}">
+                                            ${lead.delivery_status.toUpperCase()}
+                                        </span>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) { console.error('Data Retrieval Error:', error); }
+        }
+
+        async function exportLeads() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const url = `/api/client/portal/leads/export${statusFilter ? '?status_filter=' + statusFilter : ''}`;
+            try {
+                const response = await fetchWithAuth(url);
+                if (!response) return;
+                const blob = await response.blob();
+                const downloadUrl = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = downloadUrl;
+                a.download = `leadex_export_${Date.now()}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            } catch (error) { alert('Export pipeline failed.'); }
+        }
+
+        loadStats();
+        loadLeads();
+        setInterval(() => { loadStats(); loadLeads(); }, 30000);
+    </script>
+</body>
+</html>

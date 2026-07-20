@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="/admin-nav.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports & Export - Leadex Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1600px; margin: 0 auto; }
+        .content-header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .content-header h1 { color: #333; font-size: 28px; margin-bottom: 5px; }
+        .breadcrumb { color: #666; font-size: 14px; }
+        .content-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .content-card h2 { color: #333; margin-bottom: 10px; }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5568d3; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        .templates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .template-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        .template-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+        .template-icon { font-size: 32px; margin-bottom: 10px; }
+        .template-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .template-desc { color: #666; font-size: 14px; margin-bottom: 15px; }
+        .report-result {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        .report-result.active { display: block; }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .stat-value { font-size: 24px; font-weight: bold; color: #333; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: white;
+        }
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        table th { background: #f8f9fa; font-weight: 600; color: #333; }
+        table tr:hover { background: #f8f9fa; }
+        .loading { text-align: center; padding: 40px; color: #666; }
+        .export-buttons { margin-top: 15px; }
+        .export-buttons button { margin-right: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="content-header">
+            <h1>Reports & Export</h1>
+            <div class="breadcrumb">Home / Reports</div>
+        </div>
+
+        <div class="content-card">
+            <h2>Report Templates</h2>
+            <p style="color: #666; margin-bottom: 20px;">Generate comprehensive reports with one click</p>
+
+            <div class="templates-grid">
+                <div class="template-card">
+                    <div class="template-icon">📊</div>
+                    <div class="template-name">Lead Summary Report</div>
+                    <div class="template-desc">Overview of all leads with status breakdown and trends</div>
+                    <button class="btn btn-primary" onclick="generateReport('lead_summary')">Generate</button>
+                </div>
+
+                <div class="template-card">
+                    <div class="template-icon">📈</div>
+                    <div class="template-name">Performance Report</div>
+                    <div class="template-desc">Client performance and delivery success metrics</div>
+                    <button class="btn btn-primary" onclick="generateReport('performance')">Generate</button>
+                </div>
+
+                <div class="template-card">
+                    <div class="template-icon">💰</div>
+                    <div class="template-name">Revenue Report</div>
+                    <div class="template-desc">Credits usage and financial overview by client</div>
+                    <button class="btn btn-primary" onclick="generateReport('revenue')">Generate</button>
+                </div>
+
+                <div class="template-card">
+                    <div class="template-icon">📋</div>
+                    <div class="template-name">Export All Leads</div>
+                    <div class="template-desc">Export complete leads database to CSV</div>
+                    <button class="btn btn-primary" onclick="exportAllLeads()">Export</button>
+                </div>
+
+                <div class="template-card">
+                    <div class="template-icon">👥</div>
+                    <div class="template-name">Client Report</div>
+                    <div class="template-desc">Detailed client information and performance stats</div>
+                    <button class="btn btn-primary" onclick="generateReport('clients')">Generate</button>
+                </div>
+
+                <div class="template-card">
+                    <div class="template-icon">🔗</div>
+                    <div class="template-name">Webhook Activity</div>
+                    <div class="template-desc">Webhook delivery logs and success statistics</div>
+                    <button class="btn btn-primary" onclick="generateReport('webhooks')">Generate</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 id="reportTitle">Report Results</h2>
+            <div id="reportResult" class="report-result"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/admin';
+
+        function getToken() {
+            return localStorage.getItem('admin_token');
+        }
+
+        async function fetchWithAuth(url, options = {}) {
+            const token = getToken();
+            if (!token) {
+                window.location.href = '/admin-login.html';
+                return;
+            }
+
+            const headers = {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+
+            return fetch(url, { ...options, headers });
+        }
+
+        async function generateReport(type) {
+            const resultDiv = document.getElementById('reportResult');
+            const titleEl = document.getElementById('reportTitle');
+
+            // Show loading
+            resultDiv.className = 'report-result active';
+            resultDiv.innerHTML = '<div class="loading">Generating report...</div>';
+
+            try {
+                const response = await fetchWithAuth(`${API_BASE}/reports/quick/${type.replace('_', '-')}`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Update title
+                titleEl.textContent = formatReportTitle(type);
+
+                // Display report based on type
+                switch(type) {
+                    case 'lead_summary':
+                        displayLeadSummary(data);
+                        break;
+                    case 'performance':
+                        displayPerformance(data);
+                        break;
+                    case 'revenue':
+                        displayRevenue(data);
+                        break;
+                    case 'clients':
+                        displayClients(data);
+                        break;
+                    case 'webhooks':
+                        displayWebhooks(data);
+                        break;
+                }
+            } catch (error) {
+                console.error('Error generating report:', error);
+                resultDiv.innerHTML = `<div class="loading" style="color: #dc3545;">Error generating report: ${error.message}</div>`;
+            }
+        }
+
+        function formatReportTitle(type) {
+            const titles = {
+                'lead_summary': 'Lead Summary Report',
+                'performance': 'Performance Report',
+                'revenue': 'Revenue Report',
+                'clients': 'Client Report',
+                'webhooks': 'Webhook Activity Report'
+            };
+            return titles[type] || 'Report Results';
+        }
+
+        function displayLeadSummary(data) {
+            const d = data.data;
+            const html = `
+                <div class="stat-grid">
+                    <div class="stat-box">
+                        <div class="stat-label">Total Leads</div>
+                        <div class="stat-value">${d.total_leads}</div>
+                    </div>
+                    ${Object.entries(d.status_breakdown).map(([status, count]) => `
+                        <div class="stat-box">
+                            <div class="stat-label">${status}</div>
+                            <div class="stat-value">${count}</div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <h3>Leads by Client</h3>
+                <table>
+                    <thead><tr><th>Client</th><th>Lead Count</th></tr></thead>
+                    <tbody>
+                        ${d.leads_by_client.map(item => `
+                            <tr><td>${item.client || 'Unassigned'}</td><td>${item.count}</td></tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+
+                <h3 style="margin-top: 20px;">Recent Activity (Last 30 Days)</h3>
+                <table>
+                    <thead><tr><th>Date</th><th>Leads</th></tr></thead>
+                    <tbody>
+                        ${d.recent_leads.map(item => `
+                            <tr><td>${item.date}</td><td>${item.count}</td></tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('reportResult').innerHTML = html;
+        }
+
+        function displayPerformance(data) {
+            const d = data.data;
+            const html = `
+                <h3>Client Performance</h3>
+                <table>
+                    <thead><tr><th>Client</th><th>Total Deliveries</th><th>Successful</th><th>Success Rate</th></tr></thead>
+                    <tbody>
+                        ${d.client_performance.map(item => `
+                            <tr>
+                                <td>${item.client}</td>
+                                <td>${item.total_deliveries}</td>
+                                <td>${item.successful}</td>
+                                <td>${item.success_rate}%</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+
+                <h3 style="margin-top: 20px;">Delivery Methods</h3>
+                <table>
+                    <thead><tr><th>Method</th><th>Total</th><th>Successful</th><th>Success Rate</th></tr></thead>
+                    <tbody>
+                        ${d.delivery_methods.map(item => `
+                            <tr>
+                                <td>${item.method || 'Unknown'}</td>
+                                <td>${item.total}</td>
+                                <td>${item.successful}</td>
+                                <td>${item.success_rate}%</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('reportResult').innerHTML = html;
+        }
+
+        function displayRevenue(data) {
+            const d = data.data;
+            const html = `
+                <div class="stat-grid">
+                    <div class="stat-box">
+                        <div class="stat-label">Total Revenue</div>
+                        <div class="stat-value">${d.total_revenue.toFixed(2)}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Total Credits Balance</div>
+                        <div class="stat-value">${d.total_credits_balance.toFixed(2)}</div>
+                    </div>
+                </div>
+
+                <h3>Revenue by Client</h3>
+                <table>
+                    <thead><tr><th>Client</th><th>Credits Balance</th><th>Cost/Lead</th><th>Deliveries</th><th>Total Spent</th><th>Status</th></tr></thead>
+                    <tbody>
+                        ${d.clients.map(item => `
+                            <tr>
+                                <td>${item.client}</td>
+                                <td>${item.credits_balance.toFixed(2)}</td>
+                                <td>${item.cost_per_lead.toFixed(2)}</td>
+                                <td>${item.total_deliveries}</td>
+                                <td>${item.total_spent.toFixed(2)}</td>
+                                <td>${item.status}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('reportResult').innerHTML = html;
+        }
+
+        function displayClients(data) {
+            const d = data.data;
+            const html = `
+                <div class="stat-grid">
+                    <div class="stat-box">
+                        <div class="stat-label">Total Clients</div>
+                        <div class="stat-value">${d.total_clients}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Active Clients</div>
+                        <div class="stat-value">${d.active_clients}</div>
+                    </div>
+                </div>
+
+                <h3>Client Details</h3>
+                <table>
+                    <thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Credits</th><th>Deliveries</th><th>Success Rate</th></tr></thead>
+                    <tbody>
+                        ${d.clients.map(item => `
+                            <tr>
+                                <td>${item.name}</td>
+                                <td>${item.email || '-'}</td>
+                                <td>${item.status}</td>
+                                <td>${item.credits_balance.toFixed(2)}</td>
+                                <td>${item.total_deliveries}</td>
+                                <td>${item.success_rate}%</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('reportResult').innerHTML = html;
+        }
+
+        function displayWebhooks(data) {
+            const d = data.data;
+            const html = `
+                <h3>Webhook Stats by Client</h3>
+                <table>
+                    <thead><tr><th>Client</th><th>Total</th><th>Successful</th><th>Failed</th><th>Success Rate</th></tr></thead>
+                    <tbody>
+                        ${d.client_stats.map(item => `
+                            <tr>
+                                <td>${item.client}</td>
+                                <td>${item.total}</td>
+                                <td>${item.successful}</td>
+                                <td>${item.failed}</td>
+                                <td>${item.success_rate}%</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+
+                <h3 style="margin-top: 20px;">Last 7 Days Activity</h3>
+                <table>
+                    <thead><tr><th>Date</th><th>Total</th><th>Successful</th><th>Failed</th></tr></thead>
+                    <tbody>
+                        ${d.daily_activity.map(item => `
+                            <tr>
+                                <td>${item.date}</td>
+                                <td>${item.total}</td>
+                                <td>${item.successful}</td>
+                                <td>${item.failed}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('reportResult').innerHTML = html;
+        }
+
+        async function exportAllLeads() {
+            try {
+                const response = await fetchWithAuth(`${API_BASE}/leads/?limit=100000`);
+                const data = await response.json();
+                const leads = data.leads || [];
+
+                if (leads.length === 0) {
+                    alert('No leads to export');
+                    return;
+                }
+
+                let csv = 'Mobile,Name,Email,Status,Client,IP,User Agent,Referrer,Geo Location,UTM Parameters,Created,Updated\n';
+
+                leads.forEach(lead => {
+                    let geoText = '';
+                    if (lead.geo) {
+                        const geo = typeof lead.geo === 'string' ? JSON.parse(lead.geo) : lead.geo;
+                        geoText = `${geo.country_name || ''} (${geo.country || ''}) - ${geo.city || ''}`;
+                    }
+
+                    let utmText = '';
+                    if (lead.utm) {
+                        const utm = typeof lead.utm === 'string' ? JSON.parse(lead.utm) : lead.utm;
+                        const parts = [];
+                        if (utm.source) parts.push(`source:${utm.source}`);
+                        if (utm.medium) parts.push(`medium:${utm.medium}`);
+                        if (utm.campaign) parts.push(`campaign:${utm.campaign}`);
+                        utmText = parts.join('; ');
+                    }
+
+                    const row = [
+                        lead.mobile || '', lead.name || '', lead.email || '', lead.status || '',
+                        lead.client?.name || '', lead.ip || '', lead.user_agent || '', lead.referrer || '',
+                        geoText, utmText,
+                        lead.created_at ? new Date(lead.created_at).toLocaleString() : '',
+                        lead.updated_at ? new Date(lead.updated_at).toLocaleString() : ''
+                    ];
+
+                    csv += row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',') + '\n';
+                });
+
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `all_leads_${new Date().toISOString().slice(0,10)}.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+
+                alert(`Exported ${leads.length} leads successfully!`);
+            } catch (error) {
+                console.error('Export error:', error);
+                alert('Error exporting leads: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
+
