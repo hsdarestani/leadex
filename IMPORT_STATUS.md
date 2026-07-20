@@ -1,0 +1,48 @@
+# Server import failed
+
+Generated automatically by GitHub Actions. No secret values are included.
+
+```text
+Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+Hit:6 https://packages.microsoft.com/repos/azure-cli noble InRelease
+Hit:2 http://azure.archive.ubuntu.com/ubuntu noble InRelease
+Get:7 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
+Get:8 https://dl.google.com/linux/chrome-stable/deb stable InRelease [1825 B]
+Get:3 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
+Get:4 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
+Get:5 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+Get:9 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [198 kB]
+Get:10 https://packages.microsoft.com/ubuntu/24.04/prod noble/main armhf Packages [11.7 kB]
+Get:11 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [231 kB]
+Get:12 https://dl.google.com/linux/chrome-stable/deb stable/main amd64 Packages [1227 B]
+Get:13 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1114 kB]
+Get:14 http://azure.archive.ubuntu.com/ubuntu noble-updates/main Translation-en [272 kB]
+Get:15 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Components [180 kB]
+Get:16 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [1661 kB]
+Get:17 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe Translation-en [328 kB]
+Get:18 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Components [388 kB]
+Get:19 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Packages [1256 kB]
+Get:20 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted Translation-en [286 kB]
+Get:21 http://azure.archive.ubuntu.com/ubuntu noble-updates/multiverse amd64 Components [940 B]
+Get:22 http://azure.archive.ubuntu.com/ubuntu noble-backports/main amd64 Components [5788 B]
+Get:23 http://azure.archive.ubuntu.com/ubuntu noble-backports/universe amd64 Components [10.6 kB]
+Get:24 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Packages [853 kB]
+Get:25 http://azure.archive.ubuntu.com/ubuntu noble-security/main Translation-en [191 kB]
+Get:26 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Components [44.8 kB]
+Get:27 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Packages [1178 kB]
+Get:28 http://azure.archive.ubuntu.com/ubuntu noble-security/universe Translation-en [232 kB]
+Get:29 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Components [76.3 kB]
+Get:30 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted amd64 Packages [1166 kB]
+Get:31 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted Translation-en [268 kB]
+Fetched 10.3 MB in 1s (7679 kB/s)
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+sshpass is already the newest version (1.09-1).
+0 upgraded, 0 newly installed, 0 to remove and 24 not upgraded.
+Warning: Permanently added '91.107.240.109' (ED25519) to the list of known hosts.
+ERROR: Project auto-detection was ambiguous.
+Candidates:
+ - <none>
+```
